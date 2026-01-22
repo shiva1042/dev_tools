@@ -337,6 +337,9 @@ export default function MapPreview() {
   const prevCenterRef = useRef<[number, number] | null>(null);
   const prevZoomRef = useRef<number | null>(null);
 
+  // Track created widgets for proper cleanup
+  const widgetsRef = useRef<Array<{ widget: any; position: string }>>([]);
+
   const mapConfig = useMapStore((state) => state.map);
   const layers = useMapStore((state) => state.layers);
   const widgets = useMapStore((state) => state.widgets);
@@ -457,6 +460,17 @@ export default function MapPreview() {
     // Cleanup
     return () => {
       setViewReady(false);
+      // Clean up widgets before destroying view
+      widgetsRef.current.forEach(({ widget }) => {
+        try {
+          if (widget && typeof widget.destroy === 'function') {
+            widget.destroy();
+          }
+        } catch (err) {
+          // Ignore cleanup errors
+        }
+      });
+      widgetsRef.current = [];
       view.destroy();
       viewRef.current = null;
       mapRef.current = null;
@@ -630,11 +644,18 @@ export default function MapPreview() {
 
     if (!view || !map || !viewReady) return;
 
-    // Remove existing widgets from all positions
-    view.ui.empty('top-left');
-    view.ui.empty('top-right');
-    view.ui.empty('bottom-left');
-    view.ui.empty('bottom-right');
+    // Clean up previous widgets properly
+    widgetsRef.current.forEach(({ widget }) => {
+      try {
+        view.ui.remove(widget);
+        if (widget && typeof widget.destroy === 'function') {
+          widget.destroy();
+        }
+      } catch (err) {
+        // Ignore cleanup errors
+      }
+    });
+    widgetsRef.current = [];
 
     // Find or create graphics layer for Sketch widget
     let graphicsLayer = map.findLayerById('graphics-layer') as GraphicsLayer;
@@ -654,6 +675,7 @@ export default function MapPreview() {
             ? 'bottom-left'
             : widgetConfig.position;
           view.ui.add(widget, position);
+          widgetsRef.current.push({ widget, position });
           addedCount++;
         }
       } catch (err) {
@@ -662,7 +684,7 @@ export default function MapPreview() {
     });
 
     console.log('Widgets updated:', addedCount, 'of', widgets.length, 'widgets added');
-  }, [widgets, graphics, viewReady]);
+  }, [widgets, viewReady]);
 
   return (
     <Box
@@ -671,6 +693,14 @@ export default function MapPreview() {
         width: '100%',
         height: '100%',
         bgcolor: '#1a1a1a',
+        position: 'relative',
+        '& .esri-view': {
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+        },
       }}
     />
   );

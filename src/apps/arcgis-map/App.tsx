@@ -198,7 +198,7 @@ function App() {
             }}
           >
             {/* Map Preview */}
-            <Box sx={{ flex: 1, minHeight: 0 }}>
+            <Box sx={{ flex: 1, minHeight: 0, position: 'relative', overflow: 'hidden' }}>
               <MapPreview />
             </Box>
 
