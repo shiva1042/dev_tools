@@ -1,0 +1,58 @@
+# =============================================================================
+# Docker ignore file - Exclude files from build context
+# =============================================================================
+
+# Dependencies (will be installed fresh in container)
+node_modules/
+
+# Build output (will be generated in container)
+dist/
+
+# Development files
+.git/
+.gitignore
+.vscode/
+.idea/
+*.md
+!README.md
+
+# Environment files (should not be in image)
+.env
+.env.*
+!.env.example
+
+# Test files
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+__tests__/
+coverage/
+
+# CI/CD and deployment files
+.github/
+k8s/
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# Deployment scripts (not needed in container)
+deploy.sh
+start-dev.sh
+
+# Proxy servers (run separately if needed)
+es-proxy.js
+cors-proxy.js
+
+# Editor and OS files
+*.log
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp

@@ -1,0 +1,10 @@
+# =============================================================================
+# Kubernetes Namespace for Dev Tools Suite
+# =============================================================================
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: dev-tools
+  labels:
+    app.kubernetes.io/name: dev-tools
+    app.kubernetes.io/part-of: dev-tools-suite

@@ -1,0 +1,85 @@
+# =============================================================================
+# Kubernetes Ingress for Dev Tools Suite
+# Supports both nginx-ingress and traefik
+# =============================================================================
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev-tools
+  namespace: dev-tools
+  labels:
+    app.kubernetes.io/name: dev-tools
+    app.kubernetes.io/component: ingress
+  annotations:
+    # Nginx Ingress Controller annotations
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+
+    # SSL redirect (uncomment for HTTPS)
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+
+    # Rate limiting (optional)
+    # nginx.ingress.kubernetes.io/limit-connections: "10"
+    # nginx.ingress.kubernetes.io/limit-rps: "20"
+
+    # Traefik annotations (if using Traefik instead of nginx-ingress)
+    # traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+spec:
+  ingressClassName: nginx  # Change to "traefik" if using Traefik
+  rules:
+    # Rule for accessing via hostname
+    - host: dev-tools.example.com  # Replace with your domain
+      http:
+        paths:
+          - path: /dev-tools(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dev-tools
+                port:
+                  name: http
+
+    # Rule for accessing without hostname (optional - for local/dev clusters)
+    - http:
+        paths:
+          - path: /dev-tools(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: dev-tools
+                port:
+                  name: http
+
+  # TLS configuration (uncomment and configure for HTTPS)
+  # tls:
+  #   - hosts:
+  #       - dev-tools.example.com
+  #     secretName: dev-tools-tls
+
+---
+# =============================================================================
+# Alternative: Simple Ingress without path rewriting
+# Use this if your ingress controller doesn't support rewrite
+# =============================================================================
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: dev-tools-simple
+#   namespace: dev-tools
+# spec:
+#   ingressClassName: nginx
+#   rules:
+#     - host: dev-tools.example.com
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: dev-tools
+#                 port:
+#                   name: http

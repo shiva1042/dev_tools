@@ -1,0 +1,36 @@
+# =============================================================================
+# Kustomization file for Dev Tools Suite
+# Use: kubectl apply -k k8s/
+# =============================================================================
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: dev-tools
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/name: dev-tools
+  app.kubernetes.io/managed-by: kustomize
+
+# Resources to include
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - deployment.yaml
+  - service.yaml
+  - ingress.yaml
+  - hpa.yaml
+
+# Image configuration (can be overridden with kustomize edit)
+images:
+  - name: dev-tools
+    newName: ghcr.io/shiva1042/dev-tools
+    newTag: latest
+
+# ConfigMap generator (alternative to static configmap.yaml)
+# configMapGenerator:
+#   - name: dev-tools-config
+#     literals:
+#       - APP_NAME=Dev Tools Suite
+#       - APP_VERSION=1.0.0
+#       - BASE_PATH=/dev-tools/

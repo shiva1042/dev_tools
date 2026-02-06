@@ -31,7 +31,14 @@ const server = http.createServer((req, res) => {
   }
 
   // Get target ES URL from header or query param
-  const targetUrl = req.headers['x-es-target'] || 'https://localhost:9200';
+  let targetUrl = req.headers['x-es-target'] || 'https://localhost:9200';
+
+  // Normalize the target URL - add protocol if missing
+  targetUrl = targetUrl.toString().trim();
+  if (targetUrl && !targetUrl.match(/^https?:\/\//i)) {
+    const isLocalhost = targetUrl.startsWith('localhost') || targetUrl.startsWith('127.0.0.1');
+    targetUrl = (isLocalhost ? 'http://' : 'https://') + targetUrl;
+  }
 
   try {
     const target = new URL(targetUrl);
@@ -64,11 +71,25 @@ const server = http.createServer((req, res) => {
     });
 
     proxyReq.on('error', (err) => {
-      console.error('Proxy error:', err.message);
+      console.error(`[${new Date().toISOString()}] Proxy error to ${targetUrl}: ${err.message}`);
+
+      let userMessage = err.message;
+      // Provide more helpful error messages for common issues
+      if (err.code === 'ECONNREFUSED') {
+        userMessage = `Connection refused. Make sure Elasticsearch is running at ${target.hostname}:${target.port || (isHttps ? 443 : 9200)}`;
+      } else if (err.code === 'ENOTFOUND') {
+        userMessage = `Host not found: ${target.hostname}. Check the hostname is correct and DNS is resolving.`;
+      } else if (err.code === 'ETIMEDOUT') {
+        userMessage = `Connection timed out. The server at ${target.hostname} may be unreachable or blocked by a firewall.`;
+      } else if (err.code === 'ECONNRESET') {
+        userMessage = `Connection reset by server. The server may have rejected the connection or SSL handshake failed.`;
+      }
+
       res.writeHead(502, { 'Content-Type': 'application/json' });
       res.end(JSON.stringify({
         error: 'Proxy Error',
-        message: err.message,
+        message: userMessage,
+        code: err.code,
         target: targetUrl,
       }));
     });
@@ -76,11 +97,12 @@ const server = http.createServer((req, res) => {
     req.pipe(proxyReq);
 
   } catch (err) {
-    console.error('Invalid target URL:', err.message);
+    console.error(`[${new Date().toISOString()}] Invalid target URL: "${targetUrl}" - ${err.message}`);
     res.writeHead(400, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
       error: 'Invalid Target URL',
-      message: err.message,
+      message: `Could not parse URL: "${targetUrl}". Use format like https://hostname:9200`,
+      received: targetUrl,
     }));
   }
 });

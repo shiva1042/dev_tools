@@ -1,0 +1,15 @@
+# =============================================================================
+# KubeLinter Configuration
+# =============================================================================
+checks:
+  # Enable all default checks
+  addAllBuiltIn: true
+
+  # Exclude specific checks if needed
+  exclude:
+    # Allow running as non-root user 1001 (which we configure)
+    - "run-as-non-root"
+    # We handle this in our nginx config
+    - "no-read-only-root-fs"
+
+customChecks: []

@@ -12,14 +12,26 @@ import { useBuilderStore } from '../../store/useBuilderStore';
 import { CanvasComponent } from './CanvasComponent';
 
 export function Canvas() {
-  const { components, selectComponent, clearCanvas, canvasLayout, setCanvasLayout } = useBuilderStore();
+  const {
+    components,
+    selectComponent,
+    clearCanvas,
+    canvasLayout,
+    setCanvasLayout,
+    showGrid,
+    gridSize,
+    showOutlines,
+  } = useBuilderStore();
 
   const { setNodeRef, isOver } = useDroppable({
     id: 'canvas-droppable',
   });
 
-  const handleCanvasClick = () => {
-    selectComponent(null);
+  const handleCanvasClick = (e: React.MouseEvent) => {
+    // Only deselect if clicking directly on canvas, not on a component
+    if (e.target === e.currentTarget) {
+      selectComponent(null);
+    }
   };
 
   const handleLayoutChange = (_: React.MouseEvent<HTMLElement>, newLayout: 'vertical' | 'horizontal' | 'wrap' | null) => {
@@ -36,7 +48,8 @@ export function Canvas() {
     const baseStyles = {
       display: 'flex',
       minHeight: '100%',
-      gap: 1,
+      gap: 2,
+      p: 1,
     };
 
     switch (canvasLayout) {
@@ -62,6 +75,17 @@ export function Canvas() {
         };
     }
   };
+
+  // Grid background pattern
+  const gridPattern = showGrid
+    ? {
+        backgroundImage: `
+          linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: `${gridSize}px ${gridSize}px`,
+      }
+    : {};
 
   return (
     <Box
@@ -128,6 +152,7 @@ export function Canvas() {
         </Button>
       </Box>
 
+      {/* Canvas area */}
       <Box
         ref={setNodeRef}
         onClick={handleCanvasClick}
@@ -140,12 +165,14 @@ export function Canvas() {
           borderColor: isOver ? 'primary.main' : 'transparent',
           transition: 'all 0.2s ease',
           minHeight: 400,
+          ...gridPattern,
         }}
       >
         {components.length === 0 ? (
           <Box
             sx={{
               height: '100%',
+              minHeight: 300,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -180,6 +207,7 @@ export function Canvas() {
                 <CanvasComponent
                   key={component.id}
                   component={component}
+                  showOutlines={showOutlines}
                 />
               ))}
             </Box>

@@ -1,5 +1,5 @@
-import { useState, useRef, useCallback } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
+import { useDroppable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import {
   Box,
@@ -65,6 +65,13 @@ import {
   Check as CheckIcon,
   ArrowBack as ArrowBackIcon,
   ArrowForward as ArrowForwardIcon,
+  DragIndicator as DragIcon,
+  ContentCopy as CopyIcon,
+  KeyboardArrowUp as MoveUpIcon,
+  KeyboardArrowDown as MoveDownIcon,
+  Lock as LockIcon,
+  LockOpen as UnlockIcon,
+  Group as GroupIcon,
 } from '@mui/icons-material';
 import type { BuilderComponent, MUIComponentType, StyleProps } from '../../types';
 import { useBuilderStore } from '../../store/useBuilderStore';
@@ -73,6 +80,9 @@ import { getComponentDefinition } from '../../utils/componentDefinitions';
 interface CanvasComponentProps {
   component: BuilderComponent;
   isNested?: boolean;
+  index?: number;
+  parentId?: string | null;
+  showOutlines?: boolean;
 }
 
 // Icon map for dynamic icon rendering
@@ -90,51 +100,25 @@ const iconComponents: Record<string, React.ReactNode> = {
   ArrowForward: <ArrowForwardIcon />,
 };
 
-// Resize handle positions
-type ResizeDirection = 'e' | 'w' | 's' | 'n' | 'se' | 'sw' | 'ne' | 'nw';
+export function CanvasComponent({ component, isNested = false, index = 0, parentId = null, showOutlines = true }: CanvasComponentProps) {
+  const {
+    selectedComponentId,
+    selectComponent,
+    removeComponent,
+    duplicateComponent,
+    moveComponentUp,
+    moveComponentDown,
+    toggleLockComponent,
+    components,
+  } = useBuilderStore();
 
-interface ResizeHandleProps {
-  direction: ResizeDirection;
-  onResizeStart: (e: React.MouseEvent, direction: ResizeDirection) => void;
-}
+  const isLocked = component.locked;
+  const isGroup = component.isGroup;
 
-function ResizeHandle({ direction, onResizeStart }: ResizeHandleProps) {
-  const positionStyles: Record<ResizeDirection, React.CSSProperties> = {
-    e: { right: -4, top: '50%', transform: 'translateY(-50%)', cursor: 'ew-resize', width: 8, height: 20 },
-    w: { left: -4, top: '50%', transform: 'translateY(-50%)', cursor: 'ew-resize', width: 8, height: 20 },
-    s: { bottom: -4, left: '50%', transform: 'translateX(-50%)', cursor: 'ns-resize', width: 20, height: 8 },
-    n: { top: -4, left: '50%', transform: 'translateX(-50%)', cursor: 'ns-resize', width: 20, height: 8 },
-    se: { right: -4, bottom: -4, cursor: 'nwse-resize', width: 10, height: 10 },
-    sw: { left: -4, bottom: -4, cursor: 'nesw-resize', width: 10, height: 10 },
-    ne: { right: -4, top: -4, cursor: 'nesw-resize', width: 10, height: 10 },
-    nw: { left: -4, top: -4, cursor: 'nwse-resize', width: 10, height: 10 },
-  };
-
-  return (
-    <Box
-      onMouseDown={(e) => onResizeStart(e, direction)}
-      sx={{
-        position: 'absolute',
-        backgroundColor: 'primary.main',
-        borderRadius: direction.length === 2 ? '50%' : 1,
-        zIndex: 20,
-        '&:hover': {
-          backgroundColor: 'primary.dark',
-        },
-        ...positionStyles[direction],
-      }}
-    />
-  );
-}
-
-export function CanvasComponent({ component, isNested = false }: CanvasComponentProps) {
-  const { selectedComponentId, selectComponent, removeComponent, resizeComponent } = useBuilderStore();
   const isSelected = selectedComponentId === component.id;
   const definition = getComponentDefinition(component.type);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isResizing, setIsResizing] = useState(false);
-  const resizeStartRef = useRef<{ x: number; y: number; width: number; height: number; direction: ResizeDirection } | null>(null);
 
+  // Sortable for drag and drop reordering
   const {
     attributes,
     listeners,
@@ -142,19 +126,31 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
     transform,
     transition,
     isDragging,
+    isOver,
   } = useSortable({
     id: component.id,
     data: {
       type: 'canvas-item',
       componentId: component.id,
+      componentType: component.type,
+      parentId,
+      index,
     },
-    disabled: isResizing,
+  });
+
+  // Droppable for receiving nested components
+  const { setNodeRef: setDropRef, isOver: isDropOver } = useDroppable({
+    id: `drop-${component.id}`,
+    data: {
+      type: 'component-drop-zone',
+      componentId: component.id,
+      acceptsChildren: definition?.canHaveChildren,
+    },
   });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -167,51 +163,31 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
     removeComponent(component.id);
   };
 
-  const handleResizeStart = useCallback((e: React.MouseEvent, direction: ResizeDirection) => {
+  const handleDuplicate = (e: React.MouseEvent) => {
     e.stopPropagation();
-    e.preventDefault();
+    duplicateComponent(component.id);
+  };
 
-    if (!containerRef.current) return;
+  const handleMoveUp = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    moveComponentUp(component.id);
+  };
 
-    const rect = containerRef.current.getBoundingClientRect();
-    resizeStartRef.current = {
-      x: e.clientX,
-      y: e.clientY,
-      width: rect.width,
-      height: rect.height,
-      direction,
-    };
-    setIsResizing(true);
+  const handleMoveDown = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    moveComponentDown(component.id);
+  };
 
-    const handleMouseMove = (moveEvent: MouseEvent) => {
-      if (!resizeStartRef.current) return;
+  const handleToggleLock = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleLockComponent(component.id);
+  };
 
-      const { x, y, width, height, direction } = resizeStartRef.current;
-      const deltaX = moveEvent.clientX - x;
-      const deltaY = moveEvent.clientY - y;
-
-      let newWidth = width;
-      let newHeight = height;
-
-      // Calculate new dimensions based on direction
-      if (direction.includes('e')) newWidth = Math.max(50, width + deltaX);
-      if (direction.includes('w')) newWidth = Math.max(50, width - deltaX);
-      if (direction.includes('s')) newHeight = Math.max(30, height + deltaY);
-      if (direction.includes('n')) newHeight = Math.max(30, height - deltaY);
-
-      resizeComponent(component.id, `${Math.round(newWidth)}px`, `${Math.round(newHeight)}px`);
-    };
-
-    const handleMouseUp = () => {
-      setIsResizing(false);
-      resizeStartRef.current = null;
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  }, [component.id, resizeComponent]);
+  // Check if component can move up/down
+  const canMoveUp = index > 0;
+  const canMoveDown = parentId
+    ? true // For nested, we'd need to check parent's children
+    : index < components.length - 1;
 
   // Convert custom styles to sx-compatible object
   const getCustomSx = (): Record<string, unknown> => {
@@ -231,25 +207,36 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
     if (component.children.length === 0 && definition?.canHaveChildren) {
       return (
         <Box
+          ref={setDropRef}
           sx={{
-            minHeight: 40,
+            minHeight: 60,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            border: '1px dashed',
-            borderColor: 'grey.400',
+            border: '2px dashed',
+            borderColor: isDropOver ? 'primary.main' : 'grey.300',
             borderRadius: 1,
-            color: 'grey.500',
+            color: isDropOver ? 'primary.main' : 'grey.500',
             fontSize: '0.75rem',
-            p: 1,
+            p: 2,
+            backgroundColor: isDropOver ? 'primary.50' : 'transparent',
+            transition: 'all 0.2s ease',
           }}
         >
+          <AddIcon sx={{ mr: 0.5, fontSize: 16 }} />
           Drop components here
         </Box>
       );
     }
-    return component.children.map((child) => (
-      <CanvasComponent key={child.id} component={child} isNested />
+    return component.children.map((child, idx) => (
+      <CanvasComponent
+        key={child.id}
+        component={child}
+        isNested
+        index={idx}
+        parentId={component.id}
+        showOutlines={showOutlines}
+      />
     ));
   };
 
@@ -382,14 +369,29 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
           )}
         </RadioGroup>
       ),
-      Box: <Box sx={{ minHeight: 50, ...combinedSx }}>{renderChildren()}</Box>,
+      Box: (
+        <Box
+          ref={definition?.canHaveChildren ? setDropRef : undefined}
+          sx={{
+            minHeight: 50,
+            ...combinedSx,
+            backgroundColor: isDropOver ? 'primary.50' : (combinedSx.backgroundColor as string | undefined),
+          }}
+        >
+          {renderChildren()}
+        </Box>
+      ),
       Stack: (
         <Stack
+          ref={setDropRef}
           direction={props.direction as 'row' | 'column'}
           spacing={props.spacing as number}
           justifyContent={props.justifyContent as string}
           alignItems={props.alignItems as string}
-          sx={combinedSx}
+          sx={{
+            ...combinedSx,
+            backgroundColor: isDropOver ? 'primary.50' : (combinedSx.backgroundColor as string | undefined),
+          }}
         >
           {renderChildren()}
         </Stack>
@@ -415,13 +417,39 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
         </Box>
       ),
       Container: (
-        <Container maxWidth={props.maxWidth as 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false} sx={combinedSx}>
+        <Container
+          ref={setDropRef}
+          maxWidth={props.maxWidth as 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false}
+          sx={{
+            ...combinedSx,
+            backgroundColor: isDropOver ? 'primary.50' : (combinedSx.backgroundColor as string | undefined),
+          }}
+        >
           {renderChildren()}
         </Container>
       ),
-      Card: <Card sx={{ minWidth: 200, ...combinedSx }}>{renderChildren()}</Card>,
+      Card: (
+        <Card
+          ref={setDropRef}
+          sx={{
+            minWidth: 200,
+            ...combinedSx,
+            backgroundColor: isDropOver ? 'primary.50' : (combinedSx.backgroundColor as string | undefined),
+          }}
+        >
+          {renderChildren()}
+        </Card>
+      ),
       Paper: (
-        <Paper elevation={props.elevation as number} variant={props.variant as 'elevation' | 'outlined'} sx={combinedSx}>
+        <Paper
+          ref={setDropRef}
+          elevation={props.elevation as number}
+          variant={props.variant as 'elevation' | 'outlined'}
+          sx={{
+            ...combinedSx,
+            backgroundColor: isDropOver ? 'primary.50' : (combinedSx.backgroundColor as string | undefined),
+          }}
+        >
           {renderChildren()}
         </Paper>
       ),
@@ -505,7 +533,18 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
           sx={combinedSx}
         />
       ),
-      List: <List dense={props.dense as boolean} sx={combinedSx}>{renderChildren()}</List>,
+      List: (
+        <List
+          ref={setDropRef}
+          dense={props.dense as boolean}
+          sx={{
+            ...combinedSx,
+            backgroundColor: isDropOver ? 'primary.50' : (combinedSx.backgroundColor as string | undefined),
+          }}
+        >
+          {renderChildren()}
+        </List>
+      ),
       ListItem: (
         <ListItem divider={props.divider as boolean} sx={combinedSx}>
           <ListItemText
@@ -647,6 +686,27 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
           {renderChildren()}
         </AccordionDetails>
       ),
+      Group: (
+        <Box
+          ref={setDropRef}
+          sx={{
+            minHeight: 60,
+            p: 1,
+            border: '2px dashed',
+            borderColor: isDropOver ? 'secondary.main' : 'secondary.200',
+            borderRadius: 1,
+            backgroundColor: isDropOver ? 'secondary.50' : 'rgba(156, 39, 176, 0.05)',
+            ...combinedSx,
+          }}
+        >
+          {component.children.length > 0 ? renderChildren() : (
+            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'secondary.main', py: 2 }}>
+              <AddIcon sx={{ mr: 0.5 }} />
+              <Typography variant="body2">Drop components in group</Typography>
+            </Box>
+          )}
+        </Box>
+      ),
     };
 
     return componentMap[type] || <Box sx={combinedSx}>Unknown: {type}</Box>;
@@ -657,87 +717,200 @@ export function CanvasComponent({ component, isNested = false }: CanvasComponent
   const componentWidth = customStyles?.width;
   const componentHeight = customStyles?.height;
 
-  // Combine refs
-  const setRefs = useCallback((node: HTMLDivElement | null) => {
-    setNodeRef(node);
-    (containerRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
-  }, [setNodeRef]);
-
   return (
     <Box
-      ref={setRefs}
+      ref={setNodeRef}
       style={style}
-      {...attributes}
-      {...listeners}
       onClick={handleClick}
       sx={{
         position: 'relative',
         p: isNested ? 0.5 : 1,
         m: 0.5,
-        border: 2,
-        borderColor: isSelected ? 'primary.main' : 'transparent',
-        borderStyle: isSelected ? 'solid' : 'dashed',
+        border: showOutlines ? 2 : 0,
+        borderColor: isDragging
+          ? 'primary.dark'
+          : isOver
+            ? 'success.main'
+            : isLocked
+              ? 'warning.main'
+              : isSelected
+                ? 'primary.main'
+                : 'transparent',
+        borderStyle: isSelected || isDragging || isLocked ? 'solid' : 'dashed',
         borderRadius: 1,
-        cursor: isResizing ? 'default' : 'move',
-        backgroundColor: isSelected ? 'rgba(25, 118, 210, 0.08)' : 'transparent',
+        backgroundColor: isDragging
+          ? 'primary.100'
+          : isLocked
+            ? 'rgba(255, 152, 0, 0.05)'
+            : isSelected
+              ? 'rgba(25, 118, 210, 0.08)'
+              : 'transparent',
         width: componentWidth || 'auto',
         height: componentHeight || 'auto',
         minWidth: 50,
         minHeight: 30,
         flexShrink: 0,
+        opacity: isDragging ? 0.7 : (isLocked ? 0.8 : 1),
+        transform: isDragging ? 'scale(1.02)' : 'none',
+        boxShadow: isDragging ? 4 : 0,
+        transition: 'border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease',
+        cursor: isLocked ? 'not-allowed' : 'pointer',
         '&:hover': {
-          borderColor: isSelected ? 'primary.main' : 'grey.300',
-          backgroundColor: isSelected ? 'rgba(25, 118, 210, 0.08)' : 'rgba(0, 0, 0, 0.02)',
+          borderColor: isLocked ? 'warning.main' : (isSelected ? 'primary.main' : 'grey.400'),
+          backgroundColor: isLocked ? 'rgba(255, 152, 0, 0.05)' : (isSelected ? 'rgba(25, 118, 210, 0.08)' : 'rgba(0, 0, 0, 0.02)'),
         },
       }}
     >
-      {isSelected && (
-        <>
-          {/* Component label */}
-          <Box
-            sx={{
-              position: 'absolute',
-              top: -10,
-              left: 8,
-              backgroundColor: 'primary.main',
-              color: 'white',
-              px: 1,
-              py: 0.25,
-              borderRadius: 1,
-              fontSize: '0.7rem',
-              zIndex: 10,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.5,
-            }}
-          >
-            {component.customName || component.type}
-            {componentWidth && componentHeight && (
-              <Typography variant="caption" sx={{ ml: 0.5, opacity: 0.8, fontSize: '0.6rem' }}>
-                {componentWidth} × {componentHeight}
-              </Typography>
-            )}
-            <IconButton
-              size="small"
-              onClick={handleDelete}
-              sx={{ color: 'white', p: 0, ml: 0.5 }}
-            >
-              <DeleteIcon sx={{ fontSize: 14 }} />
-            </IconButton>
-          </Box>
+      {/* Drag Handle & Actions - Always visible on hover, more prominent when selected */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: -12,
+          left: 4,
+          right: 4,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 0.5,
+          opacity: isSelected ? 1 : 0,
+          transition: 'opacity 0.15s ease',
+          zIndex: 10,
+          '.MuiBox-root:hover > &': {
+            opacity: 1,
+          },
+        }}
+      >
+        {/* Drag Handle */}
+        <Box
+          {...(isLocked ? {} : { ...attributes, ...listeners })}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            backgroundColor: isLocked ? 'warning.main' : (isGroup ? 'secondary.main' : 'primary.main'),
+            color: 'white',
+            px: 0.75,
+            py: 0.25,
+            borderRadius: 1,
+            fontSize: '0.7rem',
+            cursor: isLocked ? 'not-allowed' : 'grab',
+            userSelect: 'none',
+            '&:active': {
+              cursor: isLocked ? 'not-allowed' : 'grabbing',
+            },
+          }}
+        >
+          {isLocked ? (
+            <LockIcon sx={{ fontSize: 14, mr: 0.5 }} />
+          ) : isGroup ? (
+            <GroupIcon sx={{ fontSize: 14, mr: 0.5 }} />
+          ) : (
+            <DragIcon sx={{ fontSize: 14, mr: 0.5 }} />
+          )}
+          <Typography variant="caption" sx={{ fontSize: '0.7rem', fontWeight: 500 }}>
+            {component.customName || component.groupName || component.type}
+          </Typography>
+        </Box>
 
-          {/* Resize handles */}
-          <ResizeHandle direction="e" onResizeStart={handleResizeStart} />
-          <ResizeHandle direction="w" onResizeStart={handleResizeStart} />
-          <ResizeHandle direction="s" onResizeStart={handleResizeStart} />
-          <ResizeHandle direction="n" onResizeStart={handleResizeStart} />
-          <ResizeHandle direction="se" onResizeStart={handleResizeStart} />
-          <ResizeHandle direction="sw" onResizeStart={handleResizeStart} />
-          <ResizeHandle direction="ne" onResizeStart={handleResizeStart} />
-          <ResizeHandle direction="nw" onResizeStart={handleResizeStart} />
-        </>
+        {/* Action Buttons */}
+        {isSelected && (
+          <Box sx={{ display: 'flex', gap: 0.25, ml: 'auto' }}>
+            <Tooltip title="Move Up" arrow placement="top">
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={handleMoveUp}
+                  disabled={!canMoveUp}
+                  sx={{
+                    p: 0.25,
+                    backgroundColor: 'grey.100',
+                    '&:hover': { backgroundColor: 'grey.200' },
+                  }}
+                >
+                  <MoveUpIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Move Down" arrow placement="top">
+              <span>
+                <IconButton
+                  size="small"
+                  onClick={handleMoveDown}
+                  disabled={!canMoveDown}
+                  sx={{
+                    p: 0.25,
+                    backgroundColor: 'grey.100',
+                    '&:hover': { backgroundColor: 'grey.200' },
+                  }}
+                >
+                  <MoveDownIcon sx={{ fontSize: 14 }} />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip title="Duplicate" arrow placement="top">
+              <IconButton
+                size="small"
+                onClick={handleDuplicate}
+                disabled={isLocked}
+                sx={{
+                  p: 0.25,
+                  backgroundColor: 'grey.100',
+                  '&:hover': { backgroundColor: 'grey.200' },
+                }}
+              >
+                <CopyIcon sx={{ fontSize: 14 }} />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title={isLocked ? 'Unlock' : 'Lock'} arrow placement="top">
+              <IconButton
+                size="small"
+                onClick={handleToggleLock}
+                sx={{
+                  p: 0.25,
+                  backgroundColor: isLocked ? 'warning.100' : 'grey.100',
+                  color: isLocked ? 'warning.main' : 'inherit',
+                  '&:hover': { backgroundColor: isLocked ? 'warning.200' : 'grey.200' },
+                }}
+              >
+                {isLocked ? <LockIcon sx={{ fontSize: 14 }} /> : <UnlockIcon sx={{ fontSize: 14 }} />}
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Delete" arrow placement="top">
+              <IconButton
+                size="small"
+                onClick={handleDelete}
+                disabled={isLocked}
+                sx={{
+                  p: 0.25,
+                  backgroundColor: 'error.50',
+                  color: 'error.main',
+                  '&:hover': { backgroundColor: 'error.100' },
+                }}
+              >
+                <DeleteIcon sx={{ fontSize: 14 }} />
+              </IconButton>
+            </Tooltip>
+          </Box>
+        )}
+      </Box>
+
+      {/* Component Content */}
+      <Box sx={{ pointerEvents: isDragging ? 'none' : 'auto' }}>
+        {renderMUIComponent()}
+      </Box>
+
+      {/* Drop indicator line - shows when dragging over */}
+      {isOver && !isDragging && (
+        <Box
+          sx={{
+            position: 'absolute',
+            left: 0,
+            right: 0,
+            bottom: -4,
+            height: 4,
+            backgroundColor: 'primary.main',
+            borderRadius: 2,
+          }}
+        />
       )}
-      {renderMUIComponent()}
     </Box>
   );
 }

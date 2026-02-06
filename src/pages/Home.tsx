@@ -1,203 +1,739 @@
 import { Link } from 'react-router-dom';
+import { useState } from 'react';
 import {
   Map as MapIcon,
   Search as SearchIcon,
   Image as ImageIcon,
   Code as CodeIcon,
-  ArrowRight,
   Layers,
   Database,
   Palette,
-  Grid3X3,
+  FileJson,
+  Regex,
+  Key,
+  Binary,
+  Fingerprint,
+  Clock,
+  GitCompare,
+  Brush,
+  FileText,
+  Users,
+  Globe,
+  Server,
+  FileCode,
+  Scissors,
+  Container,
+  Cloud,
+  Leaf,
+  Network,
+  TableProperties,
+  FileSpreadsheet,
+  Link as LinkIcon,
+  Timer,
+  Braces,
+  ScrollText,
+  Component,
+  ArrowLeftRight,
+  FunctionSquare,
+  Sparkles,
+  Filter,
+  // New icons for additional tools
+  Lock,
+  FileCode2,
+  Type,
+  KeyRound,
+  FileType,
+  Wifi,
+  Shield,
+  GitBranch,
+  Cylinder,
+  HardDrive,
+  FileX,
+  GitPullRequest,
+  Boxes,
+  Package,
+  ShieldCheck,
+  Workflow,
+  Table,
+  DatabaseZap,
+  Plug,
+  Gauge,
+  FlaskConical,
 } from 'lucide-react';
 
-interface ToolCardProps {
+interface Tool {
   title: string;
   description: string;
   icon: React.ReactNode;
-  bgGradient: string;
-  features: string[];
+  gradient: string;
   to: string;
+  category: string;
+  isNew?: boolean;
 }
 
-const ToolCard = ({ title, description, icon, bgGradient, features, to }: ToolCardProps) => (
+const categories = [
+  { id: 'all', label: 'All Tools', icon: <Layers className="w-4 h-4" /> },
+  { id: 'gis', label: 'GIS & Maps', icon: <MapIcon className="w-4 h-4" /> },
+  { id: 'data', label: 'Data & API', icon: <Database className="w-4 h-4" /> },
+  { id: 'code', label: 'Code Gen', icon: <CodeIcon className="w-4 h-4" /> },
+  { id: 'devops', label: 'DevOps', icon: <Container className="w-4 h-4" /> },
+  { id: 'testing', label: 'Testing', icon: <FlaskConical className="w-4 h-4" /> },
+  { id: 'utils', label: 'Utilities', icon: <Sparkles className="w-4 h-4" /> },
+];
+
+const tools: Tool[] = [
+  // GIS & Maps
+  {
+    title: 'ArcGIS Map Builder',
+    description: 'Visual map builder with layers, widgets & code export',
+    icon: <MapIcon className="w-5 h-5" />,
+    gradient: 'from-emerald-500 to-teal-600',
+    to: '/arcgis-map',
+    category: 'gis',
+  },
+  {
+    title: 'Map Draw Tool',
+    description: 'Draw points, polygons & circles on map, export as PNG/JPG',
+    icon: <Brush className="w-5 h-5" />,
+    gradient: 'from-cyan-500 to-teal-600',
+    to: '/map-draw',
+    category: 'gis',
+    isNew: true,
+  },
+  // Data & API
+  {
+    title: 'ES Query Designer',
+    description: 'Visual Elasticsearch query builder',
+    icon: <SearchIcon className="w-5 h-5" />,
+    gradient: 'from-blue-500 to-indigo-600',
+    to: '/es-query',
+    category: 'data',
+  },
+  {
+    title: 'API Request Builder',
+    description: 'REST API client with history',
+    icon: <Globe className="w-5 h-5" />,
+    gradient: 'from-cyan-500 to-blue-600',
+    to: '/api-client',
+    category: 'data',
+    isNew: true,
+  },
+  {
+    title: 'JSON/YAML Editor',
+    description: 'Validate, format & convert',
+    icon: <FileJson className="w-5 h-5" />,
+    gradient: 'from-amber-500 to-orange-600',
+    to: '/json-yaml',
+    category: 'data',
+    isNew: true,
+  },
+  {
+    title: 'SQL Query Builder',
+    description: 'Visual SQL query constructor',
+    icon: <Database className="w-5 h-5" />,
+    gradient: 'from-blue-600 to-indigo-700',
+    to: '/sql',
+    category: 'data',
+    isNew: true,
+  },
+  {
+    title: 'ES Index Mapping',
+    description: 'Design ES index mappings',
+    icon: <SearchIcon className="w-5 h-5" />,
+    gradient: 'from-yellow-500 to-orange-500',
+    to: '/es-mapping',
+    category: 'data',
+    isNew: true,
+  },
+  {
+    title: 'Cypher Query Builder',
+    description: 'Neo4j Cypher query builder',
+    icon: <Network className="w-5 h-5" />,
+    gradient: 'from-blue-400 to-cyan-500',
+    to: '/cypher',
+    category: 'data',
+    isNew: true,
+  },
+  {
+    title: 'JSONPath Tester',
+    description: 'Test JSONPath expressions',
+    icon: <Braces className="w-5 h-5" />,
+    gradient: 'from-orange-400 to-red-500',
+    to: '/jsonpath',
+    category: 'data',
+    isNew: true,
+  },
+  // Code Generation
+  {
+    title: 'Icon Generator Pro',
+    description: '15K+ icons with custom shapes',
+    icon: <ImageIcon className="w-5 h-5" />,
+    gradient: 'from-purple-500 to-pink-600',
+    to: '/icons-generator',
+    category: 'code',
+  },
+  {
+    title: 'React Visual Builder',
+    description: 'Drag-and-drop MUI components',
+    icon: <CodeIcon className="w-5 h-5" />,
+    gradient: 'from-orange-500 to-red-600',
+    to: '/visual-builder',
+    category: 'code',
+  },
+  {
+    title: 'React Component Gen',
+    description: 'Generate React components',
+    icon: <Component className="w-5 h-5" />,
+    gradient: 'from-cyan-400 to-blue-500',
+    to: '/react-gen',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'JPA Entity Generator',
+    description: 'Generate JPA entities & repos',
+    icon: <TableProperties className="w-5 h-5" />,
+    gradient: 'from-indigo-500 to-purple-600',
+    to: '/jpa-entity',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'MapStruct Mapper',
+    description: 'DTO-Entity mapper generator',
+    icon: <ArrowLeftRight className="w-5 h-5" />,
+    gradient: 'from-violet-500 to-fuchsia-600',
+    to: '/mapstruct',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'PostgreSQL Functions',
+    description: 'PL/pgSQL function builder',
+    icon: <FunctionSquare className="w-5 h-5" />,
+    gradient: 'from-blue-600 to-indigo-700',
+    to: '/postgresql',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'OpenAPI Editor',
+    description: 'Visual API documentation',
+    icon: <FileCode className="w-5 h-5" />,
+    gradient: 'from-emerald-500 to-green-600',
+    to: '/openapi',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'DB Migration Gen',
+    description: 'Flyway/Liquibase scripts',
+    icon: <FileSpreadsheet className="w-5 h-5" />,
+    gradient: 'from-teal-500 to-cyan-600',
+    to: '/migration',
+    category: 'code',
+    isNew: true,
+  },
+  // DevOps
+  {
+    title: 'Docker Compose',
+    description: 'Visual docker-compose builder',
+    icon: <Container className="w-5 h-5" />,
+    gradient: 'from-blue-400 to-cyan-500',
+    to: '/docker',
+    category: 'devops',
+    isNew: true,
+  },
+  {
+    title: 'Kubernetes YAML',
+    description: 'K8s manifest generator',
+    icon: <Cloud className="w-5 h-5" />,
+    gradient: 'from-blue-500 to-violet-600',
+    to: '/k8s',
+    category: 'devops',
+    isNew: true,
+  },
+  {
+    title: 'Nginx Config',
+    description: 'nginx.conf generator',
+    icon: <Server className="w-5 h-5" />,
+    gradient: 'from-green-500 to-emerald-600',
+    to: '/nginx',
+    category: 'devops',
+    isNew: true,
+  },
+  {
+    title: 'Spring Boot Config',
+    description: 'application.yml builder',
+    icon: <Leaf className="w-5 h-5" />,
+    gradient: 'from-green-500 to-lime-600',
+    to: '/spring-config',
+    category: 'devops',
+    isNew: true,
+  },
+  {
+    title: 'Logback Config',
+    description: 'Logging configuration',
+    icon: <ScrollText className="w-5 h-5" />,
+    gradient: 'from-red-500 to-pink-600',
+    to: '/logback',
+    category: 'devops',
+    isNew: true,
+  },
+  {
+    title: 'JDBC Connection',
+    description: 'Connection string builder',
+    icon: <LinkIcon className="w-5 h-5" />,
+    gradient: 'from-slate-500 to-zinc-600',
+    to: '/jdbc',
+    category: 'devops',
+    isNew: true,
+  },
+  // Utilities
+  {
+    title: 'Regex Builder',
+    description: 'Visual regex constructor',
+    icon: <Regex className="w-5 h-5" />,
+    gradient: 'from-rose-500 to-pink-600',
+    to: '/regex',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'JWT Debugger',
+    description: 'Decode & inspect tokens',
+    icon: <Key className="w-5 h-5" />,
+    gradient: 'from-violet-500 to-purple-600',
+    to: '/jwt',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Base64 Encoder',
+    description: 'Encode/decode Base64',
+    icon: <Binary className="w-5 h-5" />,
+    gradient: 'from-slate-500 to-gray-600',
+    to: '/base64',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'UUID & Hash Gen',
+    description: 'Generate UUIDs & hashes',
+    icon: <Fingerprint className="w-5 h-5" />,
+    gradient: 'from-indigo-500 to-blue-600',
+    to: '/uuid',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Cron Builder',
+    description: 'Cron expression generator',
+    icon: <Clock className="w-5 h-5" />,
+    gradient: 'from-teal-500 to-emerald-600',
+    to: '/cron',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Timestamp Converter',
+    description: 'Convert date/time formats',
+    icon: <Timer className="w-5 h-5" />,
+    gradient: 'from-amber-500 to-yellow-600',
+    to: '/timestamp',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Diff Viewer',
+    description: 'Compare text & code',
+    icon: <GitCompare className="w-5 h-5" />,
+    gradient: 'from-lime-500 to-green-600',
+    to: '/diff',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Color Palette',
+    description: 'Generate color palettes',
+    icon: <Palette className="w-5 h-5" />,
+    gradient: 'from-fuchsia-500 to-pink-600',
+    to: '/colors',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'CSS Generator',
+    description: 'Gradients, shadows & more',
+    icon: <Brush className="w-5 h-5" />,
+    gradient: 'from-sky-500 to-cyan-600',
+    to: '/css',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Markdown Editor',
+    description: 'Live preview editor',
+    icon: <FileText className="w-5 h-5" />,
+    gradient: 'from-stone-500 to-neutral-600',
+    to: '/markdown',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Data Faker',
+    description: 'Generate fake test data',
+    icon: <Users className="w-5 h-5" />,
+    gradient: 'from-yellow-500 to-amber-600',
+    to: '/faker',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Image Converter',
+    description: 'Convert & resize images',
+    icon: <Scissors className="w-5 h-5" />,
+    gradient: 'from-red-500 to-rose-600',
+    to: '/image',
+    category: 'utils',
+    isNew: true,
+  },
+  // NEW TOOLS - Utilities
+  {
+    title: 'URL Encoder',
+    description: 'Encode/decode URLs',
+    icon: <Lock className="w-5 h-5" />,
+    gradient: 'from-emerald-500 to-green-600',
+    to: '/url-encoder',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'HTML Entity Encoder',
+    description: 'Encode/decode HTML entities',
+    icon: <FileCode2 className="w-5 h-5" />,
+    gradient: 'from-orange-500 to-amber-600',
+    to: '/html-entity',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Text Case Converter',
+    description: 'Convert between case styles',
+    icon: <Type className="w-5 h-5" />,
+    gradient: 'from-pink-500 to-rose-600',
+    to: '/text-case',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Password Generator',
+    description: 'Generate secure passwords',
+    icon: <KeyRound className="w-5 h-5" />,
+    gradient: 'from-red-600 to-rose-700',
+    to: '/password',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'Lorem Ipsum',
+    description: 'Generate placeholder text',
+    icon: <FileType className="w-5 h-5" />,
+    gradient: 'from-gray-500 to-slate-600',
+    to: '/lorem-ipsum',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'IP Calculator',
+    description: 'Subnet & CIDR calculator',
+    icon: <Wifi className="w-5 h-5" />,
+    gradient: 'from-cyan-500 to-teal-600',
+    to: '/ip-calc',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'SSL Certificate Decoder',
+    description: 'Decode X.509 certificates',
+    icon: <Shield className="w-5 h-5" />,
+    gradient: 'from-green-600 to-emerald-700',
+    to: '/ssl-decoder',
+    category: 'utils',
+    isNew: true,
+  },
+  {
+    title: 'ASCII Table Generator',
+    description: 'Generate ASCII tables',
+    icon: <Table className="w-5 h-5" />,
+    gradient: 'from-stone-500 to-zinc-600',
+    to: '/ascii-table',
+    category: 'utils',
+    isNew: true,
+  },
+  // NEW TOOLS - Data & API
+  {
+    title: 'GraphQL Builder',
+    description: 'Visual GraphQL query builder',
+    icon: <GitBranch className="w-5 h-5" />,
+    gradient: 'from-pink-600 to-fuchsia-700',
+    to: '/graphql',
+    category: 'data',
+    isNew: true,
+  },
+  {
+    title: 'MongoDB Builder',
+    description: 'MongoDB query builder',
+    icon: <Cylinder className="w-5 h-5" />,
+    gradient: 'from-green-600 to-emerald-700',
+    to: '/mongodb',
+    category: 'data',
+    isNew: true,
+  },
+  {
+    title: 'Redis Commands',
+    description: 'Redis command builder',
+    icon: <HardDrive className="w-5 h-5" />,
+    gradient: 'from-red-600 to-rose-700',
+    to: '/redis',
+    category: 'data',
+    isNew: true,
+  },
+  // NEW TOOLS - Code Generation
+  {
+    title: 'pom.xml Generator',
+    description: 'Maven POM file generator',
+    icon: <Package className="w-5 h-5" />,
+    gradient: 'from-orange-600 to-red-700',
+    to: '/pom',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'Spring Security Config',
+    description: 'Security configuration builder',
+    icon: <ShieldCheck className="w-5 h-5" />,
+    gradient: 'from-green-500 to-teal-600',
+    to: '/spring-security',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'Mermaid Editor',
+    description: 'Mermaid diagram editor',
+    icon: <Workflow className="w-5 h-5" />,
+    gradient: 'from-pink-500 to-purple-600',
+    to: '/mermaid',
+    category: 'code',
+    isNew: true,
+  },
+  {
+    title: 'ERD Builder',
+    description: 'Database schema designer',
+    icon: <DatabaseZap className="w-5 h-5" />,
+    gradient: 'from-indigo-500 to-violet-600',
+    to: '/erd',
+    category: 'code',
+    isNew: true,
+  },
+  // NEW TOOLS - DevOps
+  {
+    title: 'Gitignore Generator',
+    description: 'Generate .gitignore files',
+    icon: <FileX className="w-5 h-5" />,
+    gradient: 'from-gray-600 to-slate-700',
+    to: '/gitignore',
+    category: 'devops',
+    isNew: true,
+  },
+  {
+    title: 'GitHub Actions Builder',
+    description: 'CI/CD workflow generator',
+    icon: <GitPullRequest className="w-5 h-5" />,
+    gradient: 'from-purple-600 to-indigo-700',
+    to: '/github-actions',
+    category: 'devops',
+    isNew: true,
+  },
+  {
+    title: 'Terraform Builder',
+    description: 'Generate Terraform configs',
+    icon: <Boxes className="w-5 h-5" />,
+    gradient: 'from-violet-600 to-purple-700',
+    to: '/terraform',
+    category: 'devops',
+    isNew: true,
+  },
+  // NEW TOOLS - Testing
+  {
+    title: 'Mock API Server',
+    description: 'Create mock REST endpoints',
+    icon: <Server className="w-5 h-5" />,
+    gradient: 'from-cyan-600 to-blue-700',
+    to: '/mock-api',
+    category: 'testing',
+    isNew: true,
+  },
+  {
+    title: 'WebSocket Tester',
+    description: 'Test WebSocket connections',
+    icon: <Plug className="w-5 h-5" />,
+    gradient: 'from-yellow-500 to-amber-600',
+    to: '/websocket',
+    category: 'testing',
+    isNew: true,
+  },
+  {
+    title: 'Load Test Config',
+    description: 'Generate load test scripts',
+    icon: <Gauge className="w-5 h-5" />,
+    gradient: 'from-red-500 to-orange-600',
+    to: '/load-test',
+    category: 'testing',
+    isNew: true,
+  },
+];
+
+const ToolCard = ({ tool }: { tool: Tool }) => (
   <Link
-    to={to}
-    className="group relative overflow-hidden rounded-2xl bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:border-gray-600/50"
+    to={tool.to}
+    className="group relative flex items-center gap-3 p-3 rounded-xl bg-gray-800/40 border border-gray-700/40 hover:bg-gray-800/70 hover:border-gray-600/60 transition-all duration-200 hover:shadow-lg hover:shadow-black/20"
   >
-    {/* Gradient background on hover */}
+    {/* Icon */}
     <div
-      className={`absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 ${bgGradient}`}
-    />
+      className={`flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br ${tool.gradient} flex items-center justify-center text-white shadow-lg`}
+    >
+      {tool.icon}
+    </div>
 
-    <div className="relative z-10">
-      {/* Icon */}
-      <div
-        className={`inline-flex items-center justify-center w-14 h-14 rounded-xl ${bgGradient} mb-4`}
-      >
-        {icon}
+    {/* Content */}
+    <div className="flex-1 min-w-0">
+      <div className="flex items-center gap-2">
+        <h3 className="text-sm font-medium text-white truncate group-hover:text-blue-400 transition-colors">
+          {tool.title}
+        </h3>
+        {tool.isNew && (
+          <span className="flex-shrink-0 text-[10px] font-semibold bg-blue-500/20 text-blue-400 px-1.5 py-0.5 rounded">
+            NEW
+          </span>
+        )}
       </div>
-
-      {/* Title & Description */}
-      <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-blue-400 transition-colors">
-        {title}
-      </h3>
-      <p className="text-gray-400 text-sm mb-4 leading-relaxed">{description}</p>
-
-      {/* Features */}
-      <ul className="space-y-1.5 mb-6">
-        {features.map((feature, index) => (
-          <li key={index} className="flex items-center gap-2 text-gray-500 text-xs">
-            <div className="w-1 h-1 rounded-full bg-gray-600" />
-            {feature}
-          </li>
-        ))}
-      </ul>
-
-      {/* Launch button */}
-      <div className="flex items-center gap-2 text-blue-400 text-sm font-medium group-hover:gap-3 transition-all">
-        <span>Launch Tool</span>
-        <ArrowRight className="w-4 h-4" />
-      </div>
+      <p className="text-xs text-gray-500 truncate">{tool.description}</p>
     </div>
   </Link>
 );
 
-const tools: ToolCardProps[] = [
-  {
-    title: 'ArcGIS Map Builder',
-    description:
-      'Visual builder for creating ArcGIS mapping applications with layer management, widgets, and code generation.',
-    icon: <MapIcon className="w-7 h-7 text-white" />,
-    bgGradient: 'bg-gradient-to-br from-emerald-500 to-teal-600',
-    features: [
-      'Layer management (Feature, WMS, GeoJSON, Vector Tile)',
-      'Widget configuration (Legend, Scale, Compass)',
-      'Graphics & drawing tools',
-      'Popup template designer',
-      'Export generated React code',
-    ],
-    to: '/arcgis-map',
-  },
-  {
-    title: 'Elasticsearch Query Designer',
-    description:
-      'Sophisticated visual query builder for Elasticsearch with aggregations, filters, and live results preview.',
-    icon: <SearchIcon className="w-7 h-7 text-white" />,
-    bgGradient: 'bg-gradient-to-br from-blue-500 to-indigo-600',
-    features: [
-      'Visual filter builder with boolean logic',
-      'Multiple aggregation types (terms, histogram, geo)',
-      'Sub-aggregation support',
-      'Geospatial query support',
-      'Real-time JSON preview',
-    ],
-    to: '/es-query',
-  },
-  {
-    title: 'Icon Generator Pro',
-    description:
-      'Professional icon customization tool supporting 11+ icon libraries with color variants, shapes, and batch exports.',
-    icon: <ImageIcon className="w-7 h-7 text-white" />,
-    bgGradient: 'bg-gradient-to-br from-purple-500 to-pink-600',
-    features: [
-      '15,000+ icons from 11+ libraries',
-      'Custom shapes (circle, hexagon, shield)',
-      'Gradient and glow effects',
-      'Up to 50 color variants',
-      'Batch export to ZIP',
-    ],
-    to: '/icons-generator',
-  },
-  {
-    title: 'React Visual Builder',
-    description:
-      'Drag-and-drop React component builder with Material-UI components and live code generation.',
-    icon: <CodeIcon className="w-7 h-7 text-white" />,
-    bgGradient: 'bg-gradient-to-br from-orange-500 to-red-600',
-    features: [
-      'Drag-and-drop MUI components',
-      'Hierarchical component nesting',
-      'Real-time properties editor',
-      'TSX, JSX, and jQuery output',
-      'Component tree visualization',
-    ],
-    to: '/visual-builder',
-  },
-];
-
 export default function Home() {
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredTools = tools.filter((tool) => {
+    const matchesCategory = activeCategory === 'all' || tool.category === activeCategory;
+    const matchesSearch =
+      searchQuery === '' ||
+      tool.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      tool.description.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
+
+  const newToolsCount = tools.filter((t) => t.isNew).length;
+
   return (
     <div className="min-h-screen bg-gray-950">
-      {/* Background decorations */}
+      {/* Subtle background */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl" />
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-purple-500/5 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 py-16">
-        {/* Header */}
-        <header className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-800/50 border border-gray-700/50 text-gray-400 text-sm mb-6">
-            <Grid3X3 className="w-4 h-4" />
-            <span>Developer Tools Suite</span>
-          </div>
-
-          <h1 className="text-5xl font-bold text-white mb-4 tracking-tight">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8">
+        {/* Compact Header */}
+        <header className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-white mb-2">
             Dev Tools{' '}
             <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Hub
             </span>
           </h1>
-
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-            A collection of powerful visual development tools for building GIS applications,
-            designing database queries, customizing icons, and composing React components.
+          <p className="text-gray-500 text-sm">
+            {tools.length} tools for development, data & infrastructure
           </p>
         </header>
 
-        {/* Stats */}
-        <div className="flex justify-center gap-12 mb-16">
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Layers className="w-5 h-5 text-emerald-400" />
-              <span className="text-2xl font-bold text-white">4</span>
-            </div>
-            <span className="text-gray-500 text-sm">Tools</span>
+        {/* Search & Filter Bar */}
+        <div className="flex flex-col sm:flex-row gap-3 mb-6">
+          {/* Search */}
+          <div className="relative flex-1">
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+            <input
+              type="text"
+              placeholder="Search tools..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2 bg-gray-800/50 border border-gray-700/50 rounded-lg text-sm text-white placeholder-gray-500 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20 transition-all"
+            />
           </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Database className="w-5 h-5 text-blue-400" />
-              <span className="text-2xl font-bold text-white">15K+</span>
-            </div>
-            <span className="text-gray-500 text-sm">Icons</span>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <Palette className="w-5 h-5 text-purple-400" />
-              <span className="text-2xl font-bold text-white">50+</span>
-            </div>
-            <span className="text-gray-500 text-sm">MUI Components</span>
-          </div>
-          <div className="text-center">
-            <div className="flex items-center justify-center gap-2 mb-1">
-              <CodeIcon className="w-5 h-5 text-orange-400" />
-              <span className="text-2xl font-bold text-white">React 19</span>
-            </div>
-            <span className="text-gray-500 text-sm">Powered</span>
+
+          {/* Category Filter */}
+          <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => setActiveCategory(cat.id)}
+                className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+                  activeCategory === cat.id
+                    ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30'
+                    : 'bg-gray-800/40 text-gray-400 border border-gray-700/40 hover:bg-gray-800/60 hover:text-gray-300'
+                }`}
+              >
+                {cat.icon}
+                {cat.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Tool Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {tools.map((tool) => (
-            <ToolCard key={tool.to} {...tool} />
+        {/* Stats Bar */}
+        <div className="flex items-center justify-between mb-6 px-1">
+          <div className="flex items-center gap-4 text-xs text-gray-500">
+            <span className="flex items-center gap-1.5">
+              <Filter className="w-3.5 h-3.5" />
+              {filteredTools.length} tools
+            </span>
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
+              {newToolsCount} new
+            </span>
+          </div>
+        </div>
+
+        {/* Tools Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          {filteredTools.map((tool) => (
+            <ToolCard key={tool.to} tool={tool} />
           ))}
         </div>
 
+        {/* Empty State */}
+        {filteredTools.length === 0 && (
+          <div className="text-center py-16">
+            <SearchIcon className="w-12 h-12 text-gray-700 mx-auto mb-4" />
+            <p className="text-gray-500">No tools found matching your search</p>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setActiveCategory('all');
+              }}
+              className="mt-4 text-blue-400 text-sm hover:underline"
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+
         {/* Footer */}
-        <footer className="mt-16 text-center text-gray-600 text-sm">
-          <p>Built with React, TypeScript, Vite, and Tailwind CSS</p>
+        <footer className="mt-12 text-center text-gray-600 text-xs">
+          <p>Built with React 19 + TypeScript + Vite + Tailwind CSS</p>
         </footer>
       </div>
     </div>

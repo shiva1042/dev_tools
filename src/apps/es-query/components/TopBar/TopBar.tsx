@@ -36,10 +36,49 @@ export const TopBar = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [useProxy, setUseProxy] = useState(true); // Enable proxy by default for HTTPS
 
+  // Normalize and validate ES URL
+  const normalizeEsUrl = (url: string): string => {
+    let normalized = url.trim();
+
+    // Add protocol if missing
+    if (normalized && !normalized.match(/^https?:\/\//i)) {
+      // Default to https for remote servers, http for localhost
+      const isLocalhost = normalized.startsWith('localhost') || normalized.startsWith('127.0.0.1');
+      normalized = (isLocalhost ? 'http://' : 'https://') + normalized;
+    }
+
+    // Remove trailing slash
+    normalized = normalized.replace(/\/+$/, '');
+
+    return normalized;
+  };
+
+  // Validate URL and return error message if invalid
+  const validateEsUrl = (url: string): string | null => {
+    if (!url.trim()) {
+      return 'Elasticsearch URL is required';
+    }
+
+    const normalized = normalizeEsUrl(url);
+
+    try {
+      const parsed = new URL(normalized);
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        return 'URL must use http:// or https:// protocol';
+      }
+      return null; // Valid
+    } catch {
+      return `Invalid URL format: "${url}". Use format like https://hostname:9200`;
+    }
+  };
+
   // Create axios instance with or without authentication
   const axiosInstance: AxiosInstance = useMemo(() => {
+    // Normalize the ES URL before using it
+    const normalizedEsUrl = normalizeEsUrl(esUrl);
+
     // When using proxy, requests go through Vite dev server to bypass CORS
-    const baseURL = useProxy ? '/api/es' : esUrl;
+    const baseURL = useProxy ? '/api/es' : normalizedEsUrl;
 
     const config: {
       baseURL: string;
@@ -56,7 +95,7 @@ export const TopBar = () => {
         const token = btoa(`${username}:${password}`);
         config.headers = {
           'Authorization': `Basic ${token}`,
-          'X-ES-Target': esUrl, // Pass target URL to proxy
+          'X-ES-Target': normalizedEsUrl, // Pass normalized target URL to proxy
         };
       } else {
         config.auth = {
@@ -66,7 +105,7 @@ export const TopBar = () => {
       }
     } else if (useProxy) {
       config.headers = {
-        'X-ES-Target': esUrl,
+        'X-ES-Target': normalizedEsUrl,
       };
     }
 
@@ -75,6 +114,14 @@ export const TopBar = () => {
 
   // Fetch available indices from Elasticsearch
   const fetchIndices = useCallback(async () => {
+    // Validate URL before making request
+    const urlError = validateEsUrl(esUrl);
+    if (urlError) {
+      setError(urlError);
+      setIsConnected(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
@@ -87,19 +134,28 @@ export const TopBar = () => {
       setIsConnected(true);
     } catch (err: any) {
       const status = err.response?.status;
-      if (status === 401) {
+      const responseData = err.response?.data;
+
+      // Check for proxy-specific errors
+      if (responseData?.error === 'Invalid target URL' || responseData?.error === 'Invalid Target URL') {
+        setError(`Invalid Elasticsearch URL: "${esUrl}". Please use format like https://hostname:9200`);
+      } else if (responseData?.error === 'Proxy Error') {
+        setError(`Cannot connect to Elasticsearch at ${normalizeEsUrl(esUrl)}: ${responseData.message}`);
+      } else if (status === 401) {
         setError('Authentication failed. Please check your username and password.');
       } else if (status === 403) {
         setError('Access denied. User does not have permission to list indices.');
+      } else if (err.code === 'ERR_NETWORK' || err.message?.includes('Network Error')) {
+        setError(`Network error: Cannot reach Elasticsearch. ${useProxy ? 'Check if the ES server is accessible from this machine.' : 'Try enabling "Use Proxy" to bypass CORS restrictions.'}`);
       } else {
-        setError('Failed to fetch indices. Check your Elasticsearch connection and credentials.');
+        setError(`Failed to connect to Elasticsearch: ${err.message || 'Unknown error'}`);
       }
       setIsConnected(false);
       console.error('Failed to fetch indices:', err);
     } finally {
       setIsLoading(false);
     }
-  }, [axiosInstance, setAvailableIndices, setIsLoading, setError]);
+  }, [axiosInstance, esUrl, useProxy, setAvailableIndices, setIsLoading, setError]);
 
   // Fetch index mapping when an index is selected
   const fetchMapping = useCallback(

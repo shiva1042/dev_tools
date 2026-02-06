@@ -899,6 +899,22 @@ export const componentDefinitions: ComponentDefinition[] = [
     ],
     canHaveChildren: true,
   },
+  // Special Components
+  {
+    type: 'Group',
+    label: 'Group',
+    category: 'layout',
+    description: 'Container for grouping components',
+    defaultProps: {},
+    availableProps: [
+      { name: 'groupName', type: 'string', label: 'Group Name', group: 'basic' },
+      ...commonStyleProps,
+      ...commonSpacingProps,
+      ...commonLayoutProps,
+      ...commonAdvancedProps,
+    ],
+    canHaveChildren: true,
+  },
 ];
 
 export const getComponentDefinition = (type: string): ComponentDefinition | undefined => {

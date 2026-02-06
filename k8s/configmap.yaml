@@ -1,0 +1,17 @@
+# =============================================================================
+# ConfigMap for Dev Tools Suite
+# Contains nginx configuration and environment settings
+# =============================================================================
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-tools-config
+  namespace: dev-tools
+  labels:
+    app.kubernetes.io/name: dev-tools
+    app.kubernetes.io/component: config
+data:
+  # Application settings (can be mounted as env vars if needed)
+  APP_NAME: "Dev Tools Suite"
+  APP_VERSION: "1.0.0"
+  BASE_PATH: "/dev-tools/"
