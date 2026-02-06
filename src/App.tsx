@@ -66,6 +66,27 @@ const WebsocketTester = lazy(() => import('./apps/websocket-tester/App'));
 const LoadTestConfig = lazy(() => import('./apps/load-test-config/App'));
 const MapDraw = lazy(() => import('./apps/map-draw/App'));
 
+// Office Tools
+const QrGenerator = lazy(() => import('./apps/qr-generator/App'));
+const InvoiceGenerator = lazy(() => import('./apps/invoice-generator/App'));
+const PomodoroTimer = lazy(() => import('./apps/pomodoro-timer/App'));
+const KanbanBoard = lazy(() => import('./apps/kanban-board/App'));
+const UnitConverter = lazy(() => import('./apps/unit-converter/App'));
+const EmailSignature = lazy(() => import('./apps/email-signature/App'));
+const WorldClock = lazy(() => import('./apps/world-clock/App'));
+const ExpenseTracker = lazy(() => import('./apps/expense-tracker/App'));
+const CharacterCounter = lazy(() => import('./apps/character-counter/App'));
+const HashGenerator = lazy(() => import('./apps/hash-generator/App'));
+const FileSizeCalculator = lazy(() => import('./apps/file-size-calculator/App'));
+const MeetingNotes = lazy(() => import('./apps/meeting-notes/App'));
+const BudgetPlanner = lazy(() => import('./apps/budget-planner/App'));
+const SalaryCalculator = lazy(() => import('./apps/salary-calculator/App'));
+const CountdownTimer = lazy(() => import('./apps/countdown-timer/App'));
+const Stopwatch = lazy(() => import('./apps/stopwatch/App'));
+const NotePad = lazy(() => import('./apps/note-pad/App'));
+const Checklist = lazy(() => import('./apps/checklist/App'));
+const BmiCalculator = lazy(() => import('./apps/bmi-calculator/App'));
+
 // Loading component
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-screen bg-gray-900">
@@ -141,6 +162,26 @@ function App() {
         <Route path="/websocket/*" element={<WebsocketTester />} />
         <Route path="/load-test/*" element={<LoadTestConfig />} />
         <Route path="/map-draw/*" element={<MapDraw />} />
+        {/* Office Tools */}
+        <Route path="/qr-generator/*" element={<QrGenerator />} />
+        <Route path="/invoice-generator/*" element={<InvoiceGenerator />} />
+        <Route path="/pomodoro/*" element={<PomodoroTimer />} />
+        <Route path="/kanban/*" element={<KanbanBoard />} />
+        <Route path="/unit-converter/*" element={<UnitConverter />} />
+        <Route path="/email-signature/*" element={<EmailSignature />} />
+        <Route path="/world-clock/*" element={<WorldClock />} />
+        <Route path="/expense-tracker/*" element={<ExpenseTracker />} />
+        <Route path="/character-counter/*" element={<CharacterCounter />} />
+        <Route path="/hash-generator/*" element={<HashGenerator />} />
+        <Route path="/file-size/*" element={<FileSizeCalculator />} />
+        <Route path="/meeting-notes/*" element={<MeetingNotes />} />
+        <Route path="/budget-planner/*" element={<BudgetPlanner />} />
+        <Route path="/salary-calculator/*" element={<SalaryCalculator />} />
+        <Route path="/countdown/*" element={<CountdownTimer />} />
+        <Route path="/stopwatch/*" element={<Stopwatch />} />
+        <Route path="/notepad/*" element={<NotePad />} />
+        <Route path="/checklist/*" element={<Checklist />} />
+        <Route path="/bmi/*" element={<BmiCalculator />} />
       </Routes>
     </Suspense>
   );

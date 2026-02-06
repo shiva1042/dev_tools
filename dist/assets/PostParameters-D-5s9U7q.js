@@ -1,0 +1,2 @@
+import{a6 as i,cZ as a,_ as r,g as o,k as n}from"./Expand-EkfAPcFa.js";import"./index-BkyuEPT-.js";import"./Paper-DfaW9WtE.js";var e;let t=e=class extends i{static from(s){return a(e,s)}constructor(s){super(s),this.sessionId=void 0,this.rows=void 0}};r([o({type:String,json:{write:!0}})],t.prototype,"sessionId",void 0),r([o({type:[Object],json:{write:!0}})],t.prototype,"rows",void 0),t=e=r([n("esri.rest.versionManagement.gdbVersion.support.PostParameters")],t);const m=t;export{m as default};
+//# sourceMappingURL=PostParameters-D-5s9U7q.js.map

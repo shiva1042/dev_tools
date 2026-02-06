@@ -1,0 +1,2 @@
+function i(e,n,t){const{associationType:c}=e;switch(c){case"attachment":return n==="to"?t.attachment:t.structure;case"containment":return n==="to"?t.content:t.container;case"junction-edge-from-connectivity":case"junction-edge-to-connectivity":case"junction-edge-midspan-connectivity":case"junction-junction-connectivity":case"connectivity":return t.connectivity}}export{i as t};
+//# sourceMappingURL=getAssociationTitle-CbehvZwK.js.map

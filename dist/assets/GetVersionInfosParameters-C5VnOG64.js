@@ -1,0 +1,2 @@
+import{a6 as i,cZ as n,_ as r,g as s,k as a}from"./Expand-EkfAPcFa.js";import"./index-BkyuEPT-.js";import"./Paper-DfaW9WtE.js";var o;let e=o=class extends i{static from(t){return n(o,t)}constructor(t){super(t),this.ownerFilter=null,this.includeHidden=!1}};r([s({type:String,json:{write:!0}})],e.prototype,"ownerFilter",void 0),r([s({type:Boolean,json:{write:!0}})],e.prototype,"includeHidden",void 0),e=o=r([a("esri.rest.versionManagement.support.GetVersionInfosParameters")],e);const c=e;export{c as default};
+//# sourceMappingURL=GetVersionInfosParameters-C5VnOG64.js.map

@@ -1,0 +1,2 @@
+import{lp as a,cS as l}from"./Expand-EkfAPcFa.js";function i(t,e){return u(t?.data.coordinateHelper.hasZ(),e)}function u(t,e){return!!t&&e.mode!=="on-the-ground"&&!a(e)}function s(t,e){let n=null;const r=t.events.on("grab-changed",o=>{n!=null&&(n.remove(),n=null),o.action==="start"&&(n=t.disableDisplay())});return l(()=>{n?.remove(),r.remove()})}const d={Left:0,Right:2};export{d,i as o,s as r};
+//# sourceMappingURL=IViewEvents-Bvgss-F8.js.map

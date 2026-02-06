@@ -1,0 +1,2 @@
+import{s as d,d2 as u,hU as c,hV as f,H as g}from"./Expand-EkfAPcFa.js";import"./index-BkyuEPT-.js";import"./Paper-DfaW9WtE.js";async function $(i,s,a,r){if(!s)throw new d("start-editing:missing-guid","guid for version is missing");const t=u(i),o=c(t.query,{query:f({sessionId:a,f:"json"}),...r,method:"post"});s.startsWith("{")&&(s=s.slice(1,-1));const e=`${t.path}/versions/${s}/startEditing`,{data:n}=await g(e,o);return n||{success:!1}}export{$ as startEditing};
+//# sourceMappingURL=startEditing-5Vh660xp.js.map

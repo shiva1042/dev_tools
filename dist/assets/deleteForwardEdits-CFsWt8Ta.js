@@ -1,0 +1,2 @@
+import{s as p,d2 as u,hU as f,hV as m,H as c}from"./Expand-EkfAPcFa.js";import"./index-BkyuEPT-.js";import"./Paper-DfaW9WtE.js";async function g(i,s,o,r){if(!s)throw new p("post:missing-guid","guid for version is missing");const t=u(i),e=o.toJSON(),a=f(t.query,{query:m({...e,f:"json"}),...r,method:"post"});s.startsWith("{")&&(s=s.slice(1,-1));const d=`${t.path}/versions/${s}/deleteForwardEdits`,{data:n}=await c(d,a);return n}export{g as deleteForwardEdits};
+//# sourceMappingURL=deleteForwardEdits-CFsWt8Ta.js.map

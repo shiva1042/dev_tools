@@ -1,0 +1,2 @@
+import{s as p,d2 as c,hU as f,hV as u,H as g}from"./Expand-EkfAPcFa.js";import"./index-BkyuEPT-.js";import"./Paper-DfaW9WtE.js";async function v(t,s,o,a,e){if(!s)throw new p("stop-editing:missing-guid","guid for version is missing");const i=c(t),r=f(i.query,{query:u({sessionId:o,saveEdits:a,f:"json"}),...e,method:"post"});s.startsWith("{")&&(s=s.slice(1,-1));const n=`${i.path}/versions/${s}/stopEditing`,{data:d}=await g(n,r);return d||{success:!1}}export{v as stopEditing};
+//# sourceMappingURL=stopEditing-Btx80Tym.js.map

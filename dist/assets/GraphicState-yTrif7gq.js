@@ -1,0 +1,2 @@
+import{c7 as o,_ as t,g as e,k as i}from"./Expand-EkfAPcFa.js";let r=class extends o{constructor(s){super(s),this.tracking=!1,this.displaying=!1,this.error=null,this.isDraped=!1}};t([e({constructOnly:!0})],r.prototype,"graphic",void 0),t([e()],r.prototype,"tracking",void 0),t([e()],r.prototype,"displaying",void 0),t([e()],r.prototype,"error",void 0),t([e()],r.prototype,"isDraped",void 0),r=t([i("esri.views.3d.layers.graphics.GraphicState")],r);export{r as e};
+//# sourceMappingURL=GraphicState-yTrif7gq.js.map
