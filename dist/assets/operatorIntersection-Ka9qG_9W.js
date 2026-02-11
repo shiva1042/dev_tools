@@ -1,0 +1,2 @@
+import{s as o}from"./SimpleGeometryCursor-B92kdZ15.js";import"./Point2D-CosmuhnS.js";import{w as c}from"./ProjectionTransformation-Csij4irg.js";const e=new c;function a(n,r){return e.accelerateGeometry(n,r,1)}function p(n,r,t){return e.execute(n,r,t,null)}function l(n,r,t,u){const s=e.executeMany(new o(n),new o([r]),t,null,u);return Array.from(s)}function w(){return e.supportsCurves()}export{p as o,w as s,a as t,l as u};
+//# sourceMappingURL=operatorIntersection-Ka9qG_9W.js.map

@@ -1,0 +1,2 @@
+import{c as o}from"./index-D7pXJXkH.js";const n=[["path",{d:"m6 9 6 6 6-6",key:"qrunsl"}]],t=o("chevron-down",n);const c=[["path",{d:"m9 18 6-6-6-6",key:"mthhwq"}]],h=o("chevron-right",c);export{t as C,h as a};
+//# sourceMappingURL=chevron-right-C0Y4Ohkn.js.map

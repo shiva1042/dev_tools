@@ -87,6 +87,132 @@ const NotePad = lazy(() => import('./apps/note-pad/App'));
 const Checklist = lazy(() => import('./apps/checklist/App'));
 const BmiCalculator = lazy(() => import('./apps/bmi-calculator/App'));
 
+// Students & Learning Tools
+const FlashcardMaker = lazy(() => import('./apps/flashcard-maker/App'));
+const GpaCalculator = lazy(() => import('./apps/gpa-calculator/App'));
+const CitationGenerator = lazy(() => import('./apps/citation-generator/App'));
+const AlgorithmVisualizer = lazy(() => import('./apps/algorithm-visualizer/App'));
+const DataStructureVisualizer = lazy(() => import('./apps/data-structure-visualizer/App'));
+const LatexMathEditor = lazy(() => import('./apps/latex-math-editor/App'));
+const CodeSnippetRunner = lazy(() => import('./apps/code-snippet-runner/App'));
+const TypingSpeedTest = lazy(() => import('./apps/typing-speed-test/App'));
+const NumberBaseConverter = lazy(() => import('./apps/number-base-converter/App'));
+const BitwiseCalculator = lazy(() => import('./apps/bitwise-calculator/App'));
+const BigOCheatsheet = lazy(() => import('./apps/big-o-cheatsheet/App'));
+const PeriodicTable = lazy(() => import('./apps/periodic-table/App'));
+
+// Developer Tools (new)
+const GitCommandBuilder = lazy(() => import('./apps/git-command-builder/App'));
+const ChmodCalculator = lazy(() => import('./apps/chmod-calculator/App'));
+const HttpStatusReference = lazy(() => import('./apps/http-status-reference/App'));
+const CodeScreenshot = lazy(() => import('./apps/code-screenshot/App'));
+const SvgEditor = lazy(() => import('./apps/svg-editor/App'));
+const HtmlCssPlayground = lazy(() => import('./apps/html-css-playground/App'));
+const CodeFormatter = lazy(() => import('./apps/code-formatter/App'));
+const WebhookTester = lazy(() => import('./apps/webhook-tester/App'));
+const PackageJsonGenerator = lazy(() => import('./apps/package-json-generator/App'));
+const EnvEditor = lazy(() => import('./apps/env-editor/App'));
+const AsciiArtGenerator = lazy(() => import('./apps/ascii-art-generator/App'));
+const NetworkPortReference = lazy(() => import('./apps/network-port-reference/App'));
+const XmlFormatter = lazy(() => import('./apps/xml-formatter/App'));
+const JsonCsvConverter = lazy(() => import('./apps/json-csv-converter/App'));
+const EncodingConverter = lazy(() => import('./apps/encoding-converter/App'));
+
+// Office & Productivity Tools (new)
+const GanttChart = lazy(() => import('./apps/gantt-chart/App'));
+const MindMap = lazy(() => import('./apps/mind-map/App'));
+const PresentationTimer = lazy(() => import('./apps/presentation-timer/App'));
+const MeetingScheduler = lazy(() => import('./apps/meeting-scheduler/App'));
+const EmailTemplateBuilder = lazy(() => import('./apps/email-template-builder/App'));
+const HabitTracker = lazy(() => import('./apps/habit-tracker/App'));
+const DailyPlanner = lazy(() => import('./apps/daily-planner/App'));
+const Whiteboard = lazy(() => import('./apps/whiteboard/App'));
+const CsvViewer = lazy(() => import('./apps/csv-viewer/App'));
+const AgendaBuilder = lazy(() => import('./apps/agenda-builder/App'));
+const ReceiptScanner = lazy(() => import('./apps/receipt-scanner/App'));
+const LoanCalculator = lazy(() => import('./apps/loan-calculator/App'));
+const SpreadsheetFormulaRef = lazy(() => import('./apps/spreadsheet-formula-ref/App'));
+
+// General Utility Tools (new)
+const ScientificCalculator = lazy(() => import('./apps/scientific-calculator/App'));
+const BarcodeGenerator = lazy(() => import('./apps/barcode-generator/App'));
+const TextDiffMerger = lazy(() => import('./apps/text-diff-merger/App'));
+const MorseCodeConverter = lazy(() => import('./apps/morse-code-converter/App'));
+const OcrTool = lazy(() => import('./apps/ocr-tool/App'));
+const ColorBlindnessSimulator = lazy(() => import('./apps/color-blindness-simulator/App'));
+const FontPreview = lazy(() => import('./apps/font-preview/App'));
+const AspectRatioCalculator = lazy(() => import('./apps/aspect-ratio-calculator/App'));
+const ReadabilityAnalyzer = lazy(() => import('./apps/readability-analyzer/App'));
+const PrivacyRedactor = lazy(() => import('./apps/privacy-redactor/App'));
+
+// DevOps & Infrastructure Tools
+const HelmChartBuilder = lazy(() => import('./apps/helm-chart-builder/App'));
+const AnsiblePlaybookBuilder = lazy(() => import('./apps/ansible-playbook-builder/App'));
+const PrometheusQueryBuilder = lazy(() => import('./apps/prometheus-query-builder/App'));
+const GrafanaDashboardBuilder = lazy(() => import('./apps/grafana-dashboard-builder/App'));
+const VagrantFileBuilder = lazy(() => import('./apps/vagrant-file-builder/App'));
+const SystemdServiceBuilder = lazy(() => import('./apps/systemd-service-builder/App'));
+const ShellScriptGenerator = lazy(() => import('./apps/shell-script-generator/App'));
+
+// Code Converters
+const CurlToCode = lazy(() => import('./apps/curl-to-code/App'));
+const HtmlToJsx = lazy(() => import('./apps/html-to-jsx/App'));
+const CssToTailwind = lazy(() => import('./apps/css-to-tailwind/App'));
+const JsonToTypescript = lazy(() => import('./apps/json-to-typescript/App'));
+const JsonSchemaGenerator = lazy(() => import('./apps/json-schema-generator/App'));
+const SqlToNosql = lazy(() => import('./apps/sql-to-nosql/App'));
+const ProtobufBuilder = lazy(() => import('./apps/protobuf-builder/App'));
+
+// Security & Auth Tools
+const AwsIamPolicyBuilder = lazy(() => import('./apps/aws-iam-policy-builder/App'));
+const CorsConfigBuilder = lazy(() => import('./apps/cors-config-builder/App'));
+const CspHeaderBuilder = lazy(() => import('./apps/csp-header-builder/App'));
+const Oauth2FlowVisualizer = lazy(() => import('./apps/oauth2-flow-visualizer/App'));
+const RbacDesigner = lazy(() => import('./apps/rbac-designer/App'));
+const SecretGenerator = lazy(() => import('./apps/secret-generator/App'));
+const KafkaConfigBuilder = lazy(() => import('./apps/kafka-config-builder/App'));
+const RabbitmqConfigBuilder = lazy(() => import('./apps/rabbitmq-config-builder/App'));
+
+// API & Frontend Tools
+const NginxLocationTester = lazy(() => import('./apps/nginx-location-tester/App'));
+const HtaccessGenerator = lazy(() => import('./apps/htaccess-generator/App'));
+const RateLimitCalculator = lazy(() => import('./apps/rate-limit-calculator/App'));
+const ApiEndpointPlanner = lazy(() => import('./apps/api-endpoint-planner/App'));
+const MetaTagGenerator = lazy(() => import('./apps/meta-tag-generator/App'));
+const FaviconGenerator = lazy(() => import('./apps/favicon-generator/App'));
+const RobotsTxtGenerator = lazy(() => import('./apps/robots-txt-generator/App'));
+const CssGridGenerator = lazy(() => import('./apps/css-grid-generator/App'));
+
+// Frontend & Design Tools
+const CssFlexboxPlayground = lazy(() => import('./apps/css-flexbox-playground/App'));
+const AnimationBuilder = lazy(() => import('./apps/animation-builder/App'));
+const ResponsiveBreakpointTester = lazy(() => import('./apps/responsive-breakpoint-tester/App'));
+const ImageToBase64 = lazy(() => import('./apps/image-to-base64/App'));
+
+// Database Tools
+const CassandraCqlBuilder = lazy(() => import('./apps/cassandra-cql-builder/App'));
+const DynamodbTableDesigner = lazy(() => import('./apps/dynamodb-table-designer/App'));
+const DatabaseIndexAdvisor = lazy(() => import('./apps/database-index-advisor/App'));
+const DataMaskingTool = lazy(() => import('./apps/data-masking-tool/App'));
+
+// Project & Workflow Tools
+const ConventionalCommitBuilder = lazy(() => import('./apps/conventional-commit-builder/App'));
+const ChangelogGenerator = lazy(() => import('./apps/changelog-generator/App'));
+const ReadmeGenerator = lazy(() => import('./apps/readme-generator/App'));
+const LicensePicker = lazy(() => import('./apps/license-picker/App'));
+const SemverCalculator = lazy(() => import('./apps/semver-calculator/App'));
+const SprintPlanner = lazy(() => import('./apps/sprint-planner/App'));
+
+// Reference & Learning Tools
+const DependencyMatrix = lazy(() => import('./apps/dependency-matrix/App'));
+const LinuxCommandReference = lazy(() => import('./apps/linux-command-reference/App'));
+const DockerCommandReference = lazy(() => import('./apps/docker-command-reference/App'));
+const DesignPatternsReference = lazy(() => import('./apps/design-patterns-reference/App'));
+const KeyboardShortcutReference = lazy(() => import('./apps/keyboard-shortcut-reference/App'));
+const PlantumlEditor = lazy(() => import('./apps/plantuml-editor/App'));
+const LogFormatParser = lazy(() => import('./apps/log-format-parser/App'));
+const CrontabValidator = lazy(() => import('./apps/crontab-validator/App'));
+
 // Loading component
 const LoadingSpinner = () => (
   <div className="flex items-center justify-center h-screen bg-gray-900">
@@ -182,6 +308,120 @@ function App() {
         <Route path="/notepad/*" element={<NotePad />} />
         <Route path="/checklist/*" element={<Checklist />} />
         <Route path="/bmi/*" element={<BmiCalculator />} />
+        {/* Students & Learning Tools */}
+        <Route path="/flashcard-maker/*" element={<FlashcardMaker />} />
+        <Route path="/gpa-calculator/*" element={<GpaCalculator />} />
+        <Route path="/citation-generator/*" element={<CitationGenerator />} />
+        <Route path="/algorithm-visualizer/*" element={<AlgorithmVisualizer />} />
+        <Route path="/data-structure-visualizer/*" element={<DataStructureVisualizer />} />
+        <Route path="/latex-math-editor/*" element={<LatexMathEditor />} />
+        <Route path="/code-snippet-runner/*" element={<CodeSnippetRunner />} />
+        <Route path="/typing-speed-test/*" element={<TypingSpeedTest />} />
+        <Route path="/number-base-converter/*" element={<NumberBaseConverter />} />
+        <Route path="/bitwise-calculator/*" element={<BitwiseCalculator />} />
+        <Route path="/big-o-cheatsheet/*" element={<BigOCheatsheet />} />
+        <Route path="/periodic-table/*" element={<PeriodicTable />} />
+        {/* Developer Tools (new) */}
+        <Route path="/git-command-builder/*" element={<GitCommandBuilder />} />
+        <Route path="/chmod-calculator/*" element={<ChmodCalculator />} />
+        <Route path="/http-status-reference/*" element={<HttpStatusReference />} />
+        <Route path="/code-screenshot/*" element={<CodeScreenshot />} />
+        <Route path="/svg-editor/*" element={<SvgEditor />} />
+        <Route path="/html-css-playground/*" element={<HtmlCssPlayground />} />
+        <Route path="/code-formatter/*" element={<CodeFormatter />} />
+        <Route path="/webhook-tester/*" element={<WebhookTester />} />
+        <Route path="/package-json-generator/*" element={<PackageJsonGenerator />} />
+        <Route path="/env-editor/*" element={<EnvEditor />} />
+        <Route path="/ascii-art-generator/*" element={<AsciiArtGenerator />} />
+        <Route path="/network-port-reference/*" element={<NetworkPortReference />} />
+        <Route path="/xml-formatter/*" element={<XmlFormatter />} />
+        <Route path="/json-csv-converter/*" element={<JsonCsvConverter />} />
+        <Route path="/encoding-converter/*" element={<EncodingConverter />} />
+        {/* Office & Productivity Tools (new) */}
+        <Route path="/gantt-chart/*" element={<GanttChart />} />
+        <Route path="/mind-map/*" element={<MindMap />} />
+        <Route path="/presentation-timer/*" element={<PresentationTimer />} />
+        <Route path="/meeting-scheduler/*" element={<MeetingScheduler />} />
+        <Route path="/email-template-builder/*" element={<EmailTemplateBuilder />} />
+        <Route path="/habit-tracker/*" element={<HabitTracker />} />
+        <Route path="/daily-planner/*" element={<DailyPlanner />} />
+        <Route path="/whiteboard/*" element={<Whiteboard />} />
+        <Route path="/csv-viewer/*" element={<CsvViewer />} />
+        <Route path="/agenda-builder/*" element={<AgendaBuilder />} />
+        <Route path="/receipt-scanner/*" element={<ReceiptScanner />} />
+        <Route path="/loan-calculator/*" element={<LoanCalculator />} />
+        <Route path="/spreadsheet-formula-ref/*" element={<SpreadsheetFormulaRef />} />
+        {/* General Utility Tools (new) */}
+        <Route path="/scientific-calculator/*" element={<ScientificCalculator />} />
+        <Route path="/barcode-generator/*" element={<BarcodeGenerator />} />
+        <Route path="/text-diff-merger/*" element={<TextDiffMerger />} />
+        <Route path="/morse-code-converter/*" element={<MorseCodeConverter />} />
+        <Route path="/ocr-tool/*" element={<OcrTool />} />
+        <Route path="/color-blindness-simulator/*" element={<ColorBlindnessSimulator />} />
+        <Route path="/font-preview/*" element={<FontPreview />} />
+        <Route path="/aspect-ratio-calculator/*" element={<AspectRatioCalculator />} />
+        <Route path="/readability-analyzer/*" element={<ReadabilityAnalyzer />} />
+        <Route path="/privacy-redactor/*" element={<PrivacyRedactor />} />
+        {/* DevOps & Infrastructure Tools */}
+        <Route path="/helm-chart-builder/*" element={<HelmChartBuilder />} />
+        <Route path="/ansible-playbook-builder/*" element={<AnsiblePlaybookBuilder />} />
+        <Route path="/prometheus-query-builder/*" element={<PrometheusQueryBuilder />} />
+        <Route path="/grafana-dashboard-builder/*" element={<GrafanaDashboardBuilder />} />
+        <Route path="/vagrant-file-builder/*" element={<VagrantFileBuilder />} />
+        <Route path="/systemd-service-builder/*" element={<SystemdServiceBuilder />} />
+        <Route path="/shell-script-generator/*" element={<ShellScriptGenerator />} />
+        {/* Code Converters */}
+        <Route path="/curl-to-code/*" element={<CurlToCode />} />
+        <Route path="/html-to-jsx/*" element={<HtmlToJsx />} />
+        <Route path="/css-to-tailwind/*" element={<CssToTailwind />} />
+        <Route path="/json-to-typescript/*" element={<JsonToTypescript />} />
+        <Route path="/json-schema-generator/*" element={<JsonSchemaGenerator />} />
+        <Route path="/sql-to-nosql/*" element={<SqlToNosql />} />
+        <Route path="/protobuf-builder/*" element={<ProtobufBuilder />} />
+        {/* Security & Auth Tools */}
+        <Route path="/aws-iam-policy-builder/*" element={<AwsIamPolicyBuilder />} />
+        <Route path="/cors-config-builder/*" element={<CorsConfigBuilder />} />
+        <Route path="/csp-header-builder/*" element={<CspHeaderBuilder />} />
+        <Route path="/oauth2-flow-visualizer/*" element={<Oauth2FlowVisualizer />} />
+        <Route path="/rbac-designer/*" element={<RbacDesigner />} />
+        <Route path="/secret-generator/*" element={<SecretGenerator />} />
+        <Route path="/kafka-config-builder/*" element={<KafkaConfigBuilder />} />
+        <Route path="/rabbitmq-config-builder/*" element={<RabbitmqConfigBuilder />} />
+        {/* API & Frontend Tools */}
+        <Route path="/nginx-location-tester/*" element={<NginxLocationTester />} />
+        <Route path="/htaccess-generator/*" element={<HtaccessGenerator />} />
+        <Route path="/rate-limit-calculator/*" element={<RateLimitCalculator />} />
+        <Route path="/api-endpoint-planner/*" element={<ApiEndpointPlanner />} />
+        <Route path="/meta-tag-generator/*" element={<MetaTagGenerator />} />
+        <Route path="/favicon-generator/*" element={<FaviconGenerator />} />
+        <Route path="/robots-txt-generator/*" element={<RobotsTxtGenerator />} />
+        <Route path="/css-grid-generator/*" element={<CssGridGenerator />} />
+        {/* Frontend & Design Tools */}
+        <Route path="/css-flexbox-playground/*" element={<CssFlexboxPlayground />} />
+        <Route path="/animation-builder/*" element={<AnimationBuilder />} />
+        <Route path="/responsive-breakpoint-tester/*" element={<ResponsiveBreakpointTester />} />
+        <Route path="/image-to-base64/*" element={<ImageToBase64 />} />
+        {/* Database Tools */}
+        <Route path="/cassandra-cql-builder/*" element={<CassandraCqlBuilder />} />
+        <Route path="/dynamodb-table-designer/*" element={<DynamodbTableDesigner />} />
+        <Route path="/database-index-advisor/*" element={<DatabaseIndexAdvisor />} />
+        <Route path="/data-masking-tool/*" element={<DataMaskingTool />} />
+        {/* Project & Workflow Tools */}
+        <Route path="/conventional-commit-builder/*" element={<ConventionalCommitBuilder />} />
+        <Route path="/changelog-generator/*" element={<ChangelogGenerator />} />
+        <Route path="/readme-generator/*" element={<ReadmeGenerator />} />
+        <Route path="/license-picker/*" element={<LicensePicker />} />
+        <Route path="/semver-calculator/*" element={<SemverCalculator />} />
+        <Route path="/sprint-planner/*" element={<SprintPlanner />} />
+        {/* Reference & Learning Tools */}
+        <Route path="/dependency-matrix/*" element={<DependencyMatrix />} />
+        <Route path="/linux-command-reference/*" element={<LinuxCommandReference />} />
+        <Route path="/docker-command-reference/*" element={<DockerCommandReference />} />
+        <Route path="/design-patterns-reference/*" element={<DesignPatternsReference />} />
+        <Route path="/keyboard-shortcut-reference/*" element={<KeyboardShortcutReference />} />
+        <Route path="/plantuml-editor/*" element={<PlantumlEditor />} />
+        <Route path="/log-format-parser/*" element={<LogFormatParser />} />
+        <Route path="/crontab-validator/*" element={<CrontabValidator />} />
       </Routes>
     </Suspense>
   );

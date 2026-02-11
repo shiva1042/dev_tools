@@ -1,0 +1,2 @@
+import{_ as a,g as r,k as i}from"./Expand-BjFL9QNU.js";const n=t=>{const s=t;let e=class extends s{get availableFields(){return this.layer.fieldsIndex.fields.map(l=>l.name)}};return a([r()],e.prototype,"layer",void 0),a([r({readOnly:!0})],e.prototype,"availableFields",null),e=a([i("esri.views.layers.OGCFeatureLayerView")],e),e};export{n as s};
+//# sourceMappingURL=OGCFeatureLayerView-BgBS3Hzs.js.map

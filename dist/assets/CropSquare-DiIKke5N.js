@@ -1,2 +1,0 @@
-import{j as c}from"./index-BkyuEPT-.js";import{c as o}from"./Paper-DfaW9WtE.js";const s=o(c.jsx("path",{d:"M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2m0 14H6V6h12z"}));export{s as S};
-//# sourceMappingURL=CropSquare-DiIKke5N.js.map

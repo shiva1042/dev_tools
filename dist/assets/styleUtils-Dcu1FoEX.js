@@ -1,2 +1,0 @@
-import{a0 as o,T as i,aj as c}from"./Expand-EkfAPcFa.js";async function l(r,e,t){const s=r&&r.getAtOrigin&&r.getAtOrigin("renderer",e.origin);if(s&&s.type==="unique-value"&&s.styleOrigin){const n=await o(s.populateFromStyle());if(i(t),n.ok===!1){const a=n.error;e?.messages&&e.messages.push(new c("renderer:style-reference",`Failed to create unique value renderer from style reference: ${a.message}`,{error:a,context:e})),r.clear("renderer",e?.origin)}}}export{l as t};
-//# sourceMappingURL=styleUtils-Dcu1FoEX.js.map

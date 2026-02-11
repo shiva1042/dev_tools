@@ -7,7 +7,6 @@ import {
   Button,
   IconButton,
   Tooltip,
-  Slider,
   Chip,
   Tabs,
   Tab,
@@ -256,8 +255,21 @@ export default function DataFaker() {
           ))}
 
           <Paper sx={{ bgcolor: '#111', border: '1px solid #222', p: 2 }}>
-            <Typography variant="caption" sx={{ color: 'grey.600' }}>Records: {count}</Typography>
-            <Slider value={count} onChange={(_, v) => setCount(v as number)} min={1} max={1000} sx={{ mb: 2 }} />
+            <TextField
+              fullWidth
+              size="small"
+              label="Number of Records"
+              type="number"
+              value={count}
+              onChange={(e) => {
+                const val = parseInt(e.target.value, 10);
+                if (!isNaN(val) && val >= 1) setCount(val);
+                else if (e.target.value === '') setCount(1);
+              }}
+              inputProps={{ min: 1 }}
+              placeholder="e.g. 1000, 5000, 10000"
+              sx={{ mb: 2, '& .MuiInputBase-root': { color: 'grey.300' } }}
+            />
 
             <FormControl fullWidth size="small" sx={{ mb: 2 }}>
               <InputLabel sx={{ color: 'grey.500' }}>Output Format</InputLabel>

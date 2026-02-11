@@ -1,2 +1,0 @@
-import{d2 as c,hU as d,hV as f,bM as p,H as h}from"./Expand-EkfAPcFa.js";import"./index-BkyuEPT-.js";import"./Paper-DfaW9WtE.js";async function V(r,s,t){const i=c(r),a=d(i.query,{query:f({f:"json"}),...t});s.startsWith("{")&&(s=s.slice(1,-1));const e=p(i.path,"versions",s),{data:o}=await h(e,a),{versionName:n,versionGuid:u,...m}=o;return{...m,versionIdentifier:{name:n,guid:u}}}export{V as getVersion};
-//# sourceMappingURL=getVersion-DhwU58AT.js.map

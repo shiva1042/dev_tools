@@ -1,0 +1,2 @@
+import{d2 as d,hU as v,hV as c,H as h}from"./Expand-BjFL9QNU.js";import"./index-D7pXJXkH.js";import"./Paper-Cyl37ja4.js";async function g(n,r,s){const o=d(n),e=r.toJSON(),t=v(o.query,{query:c({...e,f:"json"}),...s,authMode:"no-prompt"}),a=`${o.path}/versionInfos`,{data:i}=await h(a,t);return i.versions.map(u=>{const{versionName:m,versionGuid:p,...f}=u;return{...f,versionIdentifier:{name:m,guid:p}}})}export{g as getVersionInfos};
+//# sourceMappingURL=getVersionInfos-C4AFEEMy.js.map

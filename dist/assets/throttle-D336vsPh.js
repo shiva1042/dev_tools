@@ -1,0 +1,2 @@
+import{dy as m}from"./Expand-BjFL9QNU.js";function s(i,a,n,o){let t=null,l=1e3;typeof a=="number"?(l=a,o=n):(t=a??null,l=n);const e=m(0);let v;const r=()=>{e.value=0,i.apply(o,v)},u=(...p)=>{t&&t.apply(o,p),v=p,l?e.value||(e.value=setTimeout(r,l)):r()};return u.remove=()=>{e.value&&(clearTimeout(e.value),e.value=0)},u.forceUpdate=()=>{e.value&&(clearTimeout(e.value),r())},u.hasPendingUpdates=()=>!!e.value,u}export{s as l};
+//# sourceMappingURL=throttle-D336vsPh.js.map

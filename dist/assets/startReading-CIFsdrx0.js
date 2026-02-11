@@ -1,2 +1,0 @@
-import{s as d,d2 as u,hU as c,hV as f,H as g}from"./Expand-EkfAPcFa.js";import"./index-BkyuEPT-.js";import"./Paper-DfaW9WtE.js";async function $(i,s,a,r){if(!s)throw new d("start-reading:missing-guid","guid for version is missing");const t=u(i),e=c(t.query,{query:f({sessionId:a,f:"json"}),...r,method:"post"});s.startsWith("{")&&(s=s.slice(1,-1));const o=`${t.path}/versions/${s}/startReading`,{data:n}=await g(o,e);return n||{success:!1}}export{$ as startReading};
-//# sourceMappingURL=startReading-CIFsdrx0.js.map

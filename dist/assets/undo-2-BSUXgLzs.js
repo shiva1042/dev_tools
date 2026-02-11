@@ -1,0 +1,2 @@
+import{c}from"./index-D7pXJXkH.js";const o=[["circle",{cx:"12",cy:"12",r:"10",key:"1mglay"}]],t=c("circle",o);const a=[["path",{d:"M21 21H8a2 2 0 0 1-1.42-.587l-3.994-3.999a2 2 0 0 1 0-2.828l10-10a2 2 0 0 1 2.829 0l5.999 6a2 2 0 0 1 0 2.828L12.834 21",key:"g5wo59"}],["path",{d:"m5.082 11.09 8.828 8.828",key:"1wx5vj"}]],n=c("eraser",a);const e=[["path",{d:"M9 14 4 9l5-5",key:"102s5s"}],["path",{d:"M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11",key:"f3b9sd"}]],r=c("undo-2",e);export{t as C,n as E,r as U};
+//# sourceMappingURL=undo-2-BSUXgLzs.js.map

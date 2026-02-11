@@ -1,0 +1,2 @@
+import{s as d,d2 as p,hU as u,hV as c,H as f}from"./Expand-BjFL9QNU.js";import"./index-D7pXJXkH.js";import"./Paper-Cyl37ja4.js";async function $(t,s,o,a){if(!s)throw new d("stop-reading:missing-guid","guid for version is missing");const i=p(t),e=u(i.query,{query:c({sessionId:o,f:"json"}),...a,method:"post"});s.startsWith("{")&&(s=s.slice(1,-1));const r=`${i.path}/versions/${s}/stopReading`,{data:n}=await f(r,e);return n||{success:!1}}export{$ as stopReading};
+//# sourceMappingURL=stopReading-CeN0msor.js.map

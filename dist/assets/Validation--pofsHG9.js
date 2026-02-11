@@ -1,2 +1,0 @@
-import{n as o}from"./ref-TbVp9epN.js";import{f8 as c,fd as l,f7 as r}from"./Expand-EkfAPcFa.js";const d={validationContainer:"validation-container"},f=()=>{},m=({scale:i,status:t,id:n,icon:e,message:s,ref:a})=>r`<div class=${c(d.validationContainer)} ${o(a||f)}><calcite-input-message aria-live=polite .icon=${e} id=${n??l} .scale=${i} .status=${t}>${s}</calcite-input-message></div>`;export{m as V};
-//# sourceMappingURL=Validation--pofsHG9.js.map

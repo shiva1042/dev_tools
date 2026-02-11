@@ -1,2 +1,0 @@
-import{H as s}from"./Expand-EkfAPcFa.js";async function i(a,e){let n=null;const r=typeof e=="string"?e:e.path;if(!a.has(r)){const t=await s(r.replace(/\/VersionManagementServer/i,"/FeatureServer"),{query:{f:"json"}});n={serverVersion:Number(t.data.currentVersion),featureServerUrl:r.replace(/\/VersionManagementServer/i,"/FeatureServer")},a.set(e,n)}}export{i as r};
-//# sourceMappingURL=serverVersionUtils-Bf4j7QUQ.js.map
