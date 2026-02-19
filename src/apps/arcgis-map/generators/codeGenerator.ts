@@ -17,9 +17,16 @@ function generateImports(state: MapState): string {
     'import Map from "@arcgis/core/Map";',
   ];
 
-  // Basemap imports for custom/none
+  // Basemap imports for custom/none/local-image
   if (state.map.basemap === 'none') {
     imports.push('import Color from "@arcgis/core/Color";');
+  }
+
+  if (state.map.basemap === 'local-image') {
+    imports.push('import MediaLayer from "@arcgis/core/layers/MediaLayer";');
+    imports.push('import ImageElement from "@arcgis/core/layers/support/ImageElement";');
+    imports.push('import ExtentAndRotationGeoreference from "@arcgis/core/layers/support/ExtentAndRotationGeoreference";');
+    imports.push('import Extent from "@arcgis/core/geometry/Extent";');
   }
 
   if (state.map.basemap === 'custom' && state.map.customBasemap) {
@@ -412,7 +419,7 @@ export function generateMapComponent(state: MapState): string {
   let basemapCode = '';
   let mapBasemapArg = `"${state.map.basemap}"`;
 
-  if (state.map.basemap === 'none') {
+  if (state.map.basemap === 'none' || state.map.basemap === 'local-image') {
     mapBasemapArg = 'undefined';
   } else if (state.map.basemap === 'custom' && state.map.customBasemap) {
     const { type, url, title, sublayers } = state.map.customBasemap;
@@ -463,13 +470,46 @@ export function generateMapComponent(state: MapState): string {
     mapBasemapArg = 'customBasemap';
   }
 
-  // Generate view background option for 'none' basemap
+  // Generate local image MediaLayer code
+  let localImageCode = '';
+  if (state.map.basemap === 'local-image' && state.map.localImage) {
+    const { path, name, extent } = state.map.localImage;
+    localImageCode = `
+    // Create local map image layer
+    const mapImageElement = new ImageElement({
+      image: "${path}",
+      georeference: new ExtentAndRotationGeoreference({
+        extent: new Extent({
+          xmin: ${extent.xmin},
+          ymin: ${extent.ymin},
+          xmax: ${extent.xmax},
+          ymax: ${extent.ymax},
+          spatialReference: { wkid: 4326 }
+        })
+      })
+    });
+
+    const localBasemapLayer = new MediaLayer({
+      source: [mapImageElement],
+      title: "${name}",
+      id: "local-basemap-layer"
+    });
+    map.add(localBasemapLayer, 0);
+`;
+  }
+
+  // Generate view background option for 'none'/'local-image' basemap
   let viewBackgroundCode = '';
   if (state.map.basemap === 'none' && state.map.backgroundColor) {
     const [r, g, b] = state.map.backgroundColor;
     viewBackgroundCode = `,
       background: {
         color: new Color([${r}, ${g}, ${b}, 1])
+      }`;
+  } else if (state.map.basemap === 'local-image') {
+    viewBackgroundCode = `,
+      background: {
+        color: [30, 30, 30, 1] as any
       }`;
   }
 
@@ -492,7 +532,7 @@ ${basemapCode}    // Create map
     const map = new Map({
       basemap: ${mapBasemapArg}
     });
-
+${localImageCode}
     // Create layers
 ${layerCode || '    // No layers configured'}
 
@@ -706,6 +746,14 @@ function generateJSWrapperImports(state: MapState): string {
     '"esri/Map"',
   ];
 
+  // Local image basemap imports
+  if (state.map.basemap === 'local-image') {
+    modules.push('"esri/layers/MediaLayer"');
+    modules.push('"esri/layers/support/ImageElement"');
+    modules.push('"esri/layers/support/ExtentAndRotationGeoreference"');
+    modules.push('"esri/geometry/Extent"');
+  }
+
   // Basemap imports for custom
   if (state.map.basemap === 'custom' && state.map.customBasemap) {
     modules.push('"esri/Basemap"');
@@ -803,6 +851,10 @@ function generateJSWrapperImports(state: MapState): string {
 // Generate JS wrapper module names
 function generateJSWrapperModuleNames(state: MapState): string {
   const names: string[] = ['Map'];
+
+  if (state.map.basemap === 'local-image') {
+    names.push('MediaLayer', 'ImageElement', 'ExtentAndRotationGeoreference', 'Extent');
+  }
 
   if (state.map.basemap === 'custom' && state.map.customBasemap) {
     names.push('Basemap');
@@ -902,7 +954,7 @@ export function generateJSWrapperCode(state: MapState): string {
   let createBasemapFn = '';
   let basemapArg = `"${state.map.basemap}"`;
 
-  if (state.map.basemap === 'none') {
+  if (state.map.basemap === 'none' || state.map.basemap === 'local-image') {
     basemapArg = 'null';
   } else if (state.map.basemap === 'custom' && state.map.customBasemap) {
     const { type, url, title, sublayers } = state.map.customBasemap;
@@ -944,6 +996,38 @@ export function generateJSWrapperCode(state: MapState): string {
   }
 `;
     basemapArg = 'createBasemap()';
+  }
+
+  // Generate local image layer function
+  let createLocalImageFn = '';
+  if (state.map.basemap === 'local-image' && state.map.localImage) {
+    const { path, name, extent } = state.map.localImage;
+    createLocalImageFn = `
+  /**
+   * Create local map image basemap layer
+   * @returns {MediaLayer} Media layer with local map image
+   */
+  function createLocalImageLayer() {
+    var imageElement = new ImageElement({
+      image: "${path}",
+      georeference: new ExtentAndRotationGeoreference({
+        extent: new Extent({
+          xmin: ${extent.xmin},
+          ymin: ${extent.ymin},
+          xmax: ${extent.xmax},
+          ymax: ${extent.ymax},
+          spatialReference: { wkid: 4326 }
+        })
+      })
+    });
+
+    return new MediaLayer({
+      source: [imageElement],
+      title: "${name}",
+      id: "local-basemap-layer"
+    });
+  }
+`;
   }
 
   // Generate createLayers function
@@ -1176,7 +1260,7 @@ define([
   ],
   function(${moduleNames}) {
     "use strict";
-${createBasemapFn}${createLayersFn}${createGraphicsFn}${createJsonLayersFn}${createWidgetsFn}
+${createBasemapFn}${createLocalImageFn}${createLayersFn}${createGraphicsFn}${createJsonLayersFn}${createWidgetsFn}
     /**
      * Initialize the map application
      * @param {string|HTMLElement} container - Container element or ID
@@ -1187,6 +1271,9 @@ ${createBasemapFn}${createLayersFn}${createGraphicsFn}${createJsonLayersFn}${cre
       var map = new Map({
         basemap: ${basemapArg}
       });
+
+      // Add local map image layer
+${createLocalImageFn ? '      map.add(createLocalImageLayer(), 0);' : '      // No local image basemap configured'}
 
       // Add layers
 ${state.layers.length > 0 ? '      map.addMany(createLayers());' : '      // No layers configured'}
@@ -1229,7 +1316,7 @@ ${state.widgets.length > 0 ? `        addWidgets(view${state.graphics.length > 0
     // Public API
     return {
       init: init,
-      destroy: destroy${createLayersFn ? ',\n      createLayers: createLayers' : ''}${createGraphicsFn ? ',\n      createGraphics: createGraphics,\n      createGraphicsLayer: createGraphicsLayer' : ''}${createJsonLayersFn ? ',\n      createJsonDataLayers: createJsonDataLayers' : ''}${createWidgetsFn ? ',\n      addWidgets: addWidgets' : ''}
+      destroy: destroy${createLocalImageFn ? ',\n      createLocalImageLayer: createLocalImageLayer' : ''}${createLayersFn ? ',\n      createLayers: createLayers' : ''}${createGraphicsFn ? ',\n      createGraphics: createGraphics,\n      createGraphicsLayer: createGraphicsLayer' : ''}${createJsonLayersFn ? ',\n      createJsonDataLayers: createJsonDataLayers' : ''}${createWidgetsFn ? ',\n      addWidgets: addWidgets' : ''}
     };
   }
 );

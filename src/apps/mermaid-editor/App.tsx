@@ -1,6 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowLeft, Copy, Check, GitBranch, Download } from 'lucide-react';
+import { ArrowLeft, Copy, Check, GitBranch, Download, AlertTriangle, Image } from 'lucide-react';
+import mermaid from 'mermaid';
+import { toPng } from 'html-to-image';
+
+mermaid.initialize({
+  startOnLoad: false,
+  theme: 'default',
+  securityLevel: 'loose',
+  fontFamily: 'ui-sans-serif, system-ui, sans-serif',
+});
 
 const templates = {
   flowchart: `flowchart TD
@@ -83,6 +92,45 @@ export default function MermaidEditor() {
   const [code, setCode] = useState(templates.flowchart);
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState('');
+  const [svgOutput, setSvgOutput] = useState('');
+  const previewRef = useRef<HTMLDivElement>(null);
+  const renderIdRef = useRef(0);
+
+  const renderDiagram = useCallback(async (source: string) => {
+    const currentId = ++renderIdRef.current;
+    const diagramId = `mermaid-diagram-${currentId}`;
+
+    // Remove any leftover temp elements from previous failed renders
+    const existing = document.getElementById(diagramId);
+    if (existing) existing.remove();
+
+    try {
+      const { svg } = await mermaid.render(diagramId, source);
+      // Only apply if this is still the latest render
+      if (currentId === renderIdRef.current) {
+        setSvgOutput(svg);
+        setError('');
+      }
+    } catch (err: unknown) {
+      // Clean up the temp element mermaid may have created
+      const el = document.getElementById('d' + diagramId);
+      if (el) el.remove();
+
+      if (currentId === renderIdRef.current) {
+        setSvgOutput('');
+        const message = err instanceof Error ? err.message : 'Invalid Mermaid syntax';
+        setError(message);
+      }
+    }
+  }, []);
+
+  // Debounced rendering
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      renderDiagram(code);
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [code, renderDiagram]);
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(code);
@@ -95,15 +143,28 @@ export default function MermaidEditor() {
     setError('');
   };
 
-  const downloadSVG = async () => {
-    // In a real implementation, you'd render the Mermaid diagram and export as SVG
-    const blob = new Blob([`<!-- Mermaid Diagram -->\n${code}`], { type: 'text/plain' });
+  const downloadSVG = () => {
+    if (!svgOutput) return;
+    const blob = new Blob([svgOutput], { type: 'image/svg+xml' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'diagram.mmd';
+    a.download = 'diagram.svg';
     a.click();
     URL.revokeObjectURL(url);
+  };
+
+  const downloadPNG = async () => {
+    if (!previewRef.current || !svgOutput) return;
+    try {
+      const dataUrl = await toPng(previewRef.current, { backgroundColor: '#ffffff', pixelRatio: 2 });
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'diagram.png';
+      a.click();
+    } catch {
+      // silently fail
+    }
   };
 
   return (
@@ -146,14 +207,27 @@ export default function MermaidEditor() {
                   <button
                     onClick={copyToClipboard}
                     className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm"
+                    title="Copy code"
                   >
                     {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                   </button>
                   <button
                     onClick={downloadSVG}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm"
+                    disabled={!svgOutput}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                    title="Download SVG"
                   >
                     <Download className="w-4 h-4" />
+                    <span className="text-xs">SVG</span>
+                  </button>
+                  <button
+                    onClick={downloadPNG}
+                    disabled={!svgOutput}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+                    title="Download PNG"
+                  >
+                    <Image className="w-4 h-4" />
+                    <span className="text-xs">PNG</span>
                   </button>
                 </div>
               </div>
@@ -170,17 +244,27 @@ export default function MermaidEditor() {
           <div className="space-y-4">
             <div className="p-4 bg-gray-900 rounded-lg border border-gray-800">
               <h3 className="text-sm font-medium text-gray-300 mb-3">Preview</h3>
-              <div className="p-4 bg-white rounded-lg min-h-96 flex items-center justify-center">
-                <div className="text-center text-gray-500">
-                  <GitBranch className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-                  <p className="text-sm">Mermaid preview would render here</p>
-                  <p className="text-xs mt-2">
-                    In production, integrate with mermaid.js library
-                  </p>
-                  <pre className="mt-4 p-4 bg-gray-100 rounded text-left text-xs text-gray-700 overflow-auto max-h-64">
-                    {code}
-                  </pre>
-                </div>
+              <div className="bg-white rounded-lg min-h-96 flex items-center justify-center overflow-auto">
+                {error ? (
+                  <div className="p-6 text-center">
+                    <AlertTriangle className="w-10 h-10 mx-auto mb-3 text-red-400" />
+                    <p className="text-sm font-medium text-red-600 mb-2">Syntax Error</p>
+                    <pre className="text-xs text-red-500 bg-red-50 p-3 rounded-lg max-h-48 overflow-auto text-left whitespace-pre-wrap">
+                      {error}
+                    </pre>
+                  </div>
+                ) : svgOutput ? (
+                  <div
+                    ref={previewRef}
+                    className="p-4 w-full [&>svg]:max-w-full [&>svg]:h-auto [&>svg]:mx-auto"
+                    dangerouslySetInnerHTML={{ __html: svgOutput }}
+                  />
+                ) : (
+                  <div className="text-center text-gray-400 p-6">
+                    <GitBranch className="w-10 h-10 mx-auto mb-3" />
+                    <p className="text-sm">Rendering...</p>
+                  </div>
+                )}
               </div>
             </div>
 

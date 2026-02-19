@@ -9,6 +9,10 @@ import WMSLayer from '@arcgis/core/layers/WMSLayer';
 import WMTSLayer from '@arcgis/core/layers/WMTSLayer';
 import TileLayer from '@arcgis/core/layers/TileLayer';
 import WebTileLayer from '@arcgis/core/layers/WebTileLayer';
+import MediaLayer from '@arcgis/core/layers/MediaLayer';
+import ImageElement from '@arcgis/core/layers/support/ImageElement';
+import ExtentAndRotationGeoreference from '@arcgis/core/layers/support/ExtentAndRotationGeoreference';
+import Extent from '@arcgis/core/geometry/Extent';
 import Basemap from '@arcgis/core/Basemap';
 import Color from '@arcgis/core/Color';
 import GeoJSONLayer from '@arcgis/core/layers/GeoJSONLayer';
@@ -339,6 +343,8 @@ export default function MapPreview() {
 
   // Track created widgets for proper cleanup
   const widgetsRef = useRef<Array<{ widget: any; position: string }>>([]);
+  // Track local image MediaLayer for cleanup
+  const localImageLayerRef = useRef<MediaLayer | null>(null);
 
   const mapConfig = useMapStore((state) => state.map);
   const layers = useMapStore((state) => state.layers);
@@ -348,8 +354,8 @@ export default function MapPreview() {
 
   // Create basemap based on config
   const createBasemap = () => {
-    if (mapConfig.basemap === 'none') {
-      // No basemap - return undefined, will set background color on view
+    if (mapConfig.basemap === 'none' || mapConfig.basemap === 'local-image') {
+      // No basemap - return undefined, will use MediaLayer for local-image
       return undefined;
     }
 
@@ -431,8 +437,8 @@ export default function MapPreview() {
       zoom: mapConfig.zoom,
     };
 
-    // Set background color for 'none' basemap
-    if (mapConfig.basemap === 'none' && mapConfig.backgroundColor) {
+    // Set background color for 'none' or 'local-image' basemap
+    if ((mapConfig.basemap === 'none' || mapConfig.basemap === 'local-image') && mapConfig.backgroundColor) {
       viewOptions.background = {
         color: new Color([
           mapConfig.backgroundColor[0],
@@ -440,6 +446,10 @@ export default function MapPreview() {
           mapConfig.backgroundColor[2],
           1,
         ]),
+      };
+    } else if (mapConfig.basemap === 'local-image') {
+      viewOptions.background = {
+        color: new Color([30, 30, 30, 1]),
       };
     }
 
@@ -481,6 +491,12 @@ export default function MapPreview() {
   useEffect(() => {
     if (!mapRef.current || !viewReady) return;
 
+    // Remove old local image layer if exists
+    if (localImageLayerRef.current) {
+      mapRef.current.remove(localImageLayerRef.current);
+      localImageLayerRef.current = null;
+    }
+
     const basemap = createBasemap();
     mapRef.current.basemap = basemap as any;
 
@@ -495,7 +511,40 @@ export default function MapPreview() {
         ]),
       };
     }
-  }, [mapConfig.basemap, mapConfig.customBasemap, mapConfig.backgroundColor, viewReady]);
+
+    // Handle local-image basemap
+    if (mapConfig.basemap === 'local-image' && mapConfig.localImage) {
+      const { path, extent } = mapConfig.localImage;
+      const imageElement = new ImageElement({
+        image: path,
+        georeference: new ExtentAndRotationGeoreference({
+          extent: new Extent({
+            xmin: extent.xmin,
+            ymin: extent.ymin,
+            xmax: extent.xmax,
+            ymax: extent.ymax,
+            spatialReference: { wkid: 4326 },
+          }),
+        }),
+      });
+
+      const mediaLayer = new MediaLayer({
+        source: [imageElement],
+        title: mapConfig.localImage.name,
+        id: 'local-basemap-layer',
+      });
+
+      localImageLayerRef.current = mediaLayer;
+      mapRef.current.add(mediaLayer, 0); // Add at bottom
+
+      // Set dark background
+      if (viewRef.current) {
+        (viewRef.current as any).background = {
+          color: new Color([30, 30, 30, 1]),
+        };
+      }
+    }
+  }, [mapConfig.basemap, mapConfig.customBasemap, mapConfig.backgroundColor, mapConfig.localImage, viewReady]);
 
   // Update center and zoom
   useEffect(() => {
@@ -529,10 +578,10 @@ export default function MapPreview() {
   useEffect(() => {
     if (!mapRef.current || !viewReady) return;
 
-    // Remove all layers except graphics layer and JSON data layers
+    // Remove all layers except graphics layer, JSON data layers, and local basemap
     const existingLayers = mapRef.current.layers.toArray();
     existingLayers.forEach((layer) => {
-      if (layer.id !== 'graphics-layer' && !layer.id.startsWith('json-data-layer-')) {
+      if (layer.id !== 'graphics-layer' && !layer.id.startsWith('json-data-layer-') && layer.id !== 'local-basemap-layer') {
         mapRef.current?.remove(layer);
       }
     });

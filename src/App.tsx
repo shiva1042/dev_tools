@@ -212,6 +212,53 @@ const KeyboardShortcutReference = lazy(() => import('./apps/keyboard-shortcut-re
 const PlantumlEditor = lazy(() => import('./apps/plantuml-editor/App'));
 const LogFormatParser = lazy(() => import('./apps/log-format-parser/App'));
 const CrontabValidator = lazy(() => import('./apps/crontab-validator/App'));
+const GrokParser = lazy(() => import('./apps/grok-parser/App'));
+const JavaCodeGenerator = lazy(() => import('./apps/java-code-generator/App'));
+
+// GeoServer & GIS Tools
+const GeoServerRestBuilder = lazy(() => import('./apps/geoserver-rest-builder/App'));
+const SldStyleGenerator = lazy(() => import('./apps/sld-style-generator/App'));
+const CqlFilterBuilder = lazy(() => import('./apps/cql-filter-builder/App'));
+
+// OGC & ArcGIS Tools
+const WmsWfsBuilder = lazy(() => import('./apps/wms-wfs-builder/App'));
+const ArcGISQueryBuilder = lazy(() => import('./apps/arcgis-query-builder/App'));
+const ArcGISServiceUrl = lazy(() => import('./apps/arcgis-service-url/App'));
+
+// GIS Utilities & Converters
+const ArcadeExpressionBuilder = lazy(() => import('./apps/arcade-expression-builder/App'));
+const GeoJsonEditor = lazy(() => import('./apps/geojson-editor/App'));
+const CoordinateConverter = lazy(() => import('./apps/coordinate-converter/App'));
+const BboxGenerator = lazy(() => import('./apps/bbox-generator/App'));
+const PostgisQueryBuilder = lazy(() => import('./apps/postgis-query-builder/App'));
+const WktGeojsonConverter = lazy(() => import('./apps/wkt-geojson-converter/App'));
+const MapTileUrlBuilder = lazy(() => import('./apps/map-tile-url-builder/App'));
+const EpsgCrsReference = lazy(() => import('./apps/epsg-crs-reference/App'));
+const ShapefileStyleBuilder = lazy(() => import('./apps/shapefile-style-builder/App'));
+
+// Government Forms & Calculators
+const LtcClaimCalculator = lazy(() => import('./apps/ltc-claim-calculator/App'));
+const TaDaCalculator = lazy(() => import('./apps/ta-da-calculator/App'));
+const TransferTaCalculator = lazy(() => import('./apps/transfer-ta-calculator/App'));
+const FestivalAdvanceCalc = lazy(() => import('./apps/festival-advance-calc/App'));
+const PayFixationCalculator = lazy(() => import('./apps/pay-fixation-calculator/App'));
+const PayLevelMatrix = lazy(() => import('./apps/pay-level-matrix/App'));
+const GovtSalarySlip = lazy(() => import('./apps/govt-salary-slip/App'));
+const DaRateLookup = lazy(() => import('./apps/da-rate-lookup/App'));
+const PensionGratuityCalculator = lazy(() => import('./apps/pension-gratuity-calculator/App'));
+const RetirementPlanner = lazy(() => import('./apps/retirement-planner/App'));
+const GpfCalculator = lazy(() => import('./apps/gpf-calculator/App'));
+const NpsTracker = lazy(() => import('./apps/nps-tracker/App'));
+const IncomeTaxCalculator = lazy(() => import('./apps/income-tax-calculator/App'));
+const HraCalculator = lazy(() => import('./apps/hra-calculator/App'));
+const CghsClaimForm = lazy(() => import('./apps/cghs-claim-form/App'));
+const GisCgegisCalculator = lazy(() => import('./apps/gis-cgegis-calculator/App'));
+const LeaveManager = lazy(() => import('./apps/leave-manager/App'));
+const CeaReimbursement = lazy(() => import('./apps/cea-reimbursement/App'));
+const PropertyReturnForm = lazy(() => import('./apps/property-return-form/App'));
+const GovtFormReference = lazy(() => import('./apps/govt-form-reference/App'));
+const FormToCodeGenerator = lazy(() => import('./apps/form-to-code-generator/App'));
+const DynamicFormCreatorApp = lazy(() => import('./apps/dynamic-form-creator/App'));
 
 // Loading component
 const LoadingSpinner = () => (
@@ -422,6 +469,49 @@ function App() {
         <Route path="/plantuml-editor/*" element={<PlantumlEditor />} />
         <Route path="/log-format-parser/*" element={<LogFormatParser />} />
         <Route path="/crontab-validator/*" element={<CrontabValidator />} />
+        <Route path="/grok-parser/*" element={<GrokParser />} />
+        <Route path="/java-code-generator/*" element={<JavaCodeGenerator />} />
+        {/* GeoServer & GIS Tools */}
+        <Route path="/geoserver-rest-builder/*" element={<GeoServerRestBuilder />} />
+        <Route path="/sld-style-generator/*" element={<SldStyleGenerator />} />
+        <Route path="/cql-filter-builder/*" element={<CqlFilterBuilder />} />
+        {/* OGC & ArcGIS Tools */}
+        <Route path="/wms-wfs-builder/*" element={<WmsWfsBuilder />} />
+        <Route path="/arcgis-query-builder/*" element={<ArcGISQueryBuilder />} />
+        <Route path="/arcgis-service-url/*" element={<ArcGISServiceUrl />} />
+        {/* GIS Utilities & Converters */}
+        <Route path="/arcade-expression-builder/*" element={<ArcadeExpressionBuilder />} />
+        <Route path="/geojson-editor/*" element={<GeoJsonEditor />} />
+        <Route path="/coordinate-converter/*" element={<CoordinateConverter />} />
+        <Route path="/bbox-generator/*" element={<BboxGenerator />} />
+        <Route path="/postgis-query-builder/*" element={<PostgisQueryBuilder />} />
+        <Route path="/wkt-geojson-converter/*" element={<WktGeojsonConverter />} />
+        <Route path="/map-tile-url-builder/*" element={<MapTileUrlBuilder />} />
+        <Route path="/epsg-crs-reference/*" element={<EpsgCrsReference />} />
+        <Route path="/shapefile-style-builder/*" element={<ShapefileStyleBuilder />} />
+        {/* Government Forms & Calculators */}
+        <Route path="/ltc-claim-calculator/*" element={<LtcClaimCalculator />} />
+        <Route path="/ta-da-calculator/*" element={<TaDaCalculator />} />
+        <Route path="/transfer-ta-calculator/*" element={<TransferTaCalculator />} />
+        <Route path="/festival-advance-calc/*" element={<FestivalAdvanceCalc />} />
+        <Route path="/pay-fixation-calculator/*" element={<PayFixationCalculator />} />
+        <Route path="/pay-level-matrix/*" element={<PayLevelMatrix />} />
+        <Route path="/govt-salary-slip/*" element={<GovtSalarySlip />} />
+        <Route path="/da-rate-lookup/*" element={<DaRateLookup />} />
+        <Route path="/pension-gratuity-calculator/*" element={<PensionGratuityCalculator />} />
+        <Route path="/retirement-planner/*" element={<RetirementPlanner />} />
+        <Route path="/gpf-calculator/*" element={<GpfCalculator />} />
+        <Route path="/nps-tracker/*" element={<NpsTracker />} />
+        <Route path="/income-tax-calculator/*" element={<IncomeTaxCalculator />} />
+        <Route path="/hra-calculator/*" element={<HraCalculator />} />
+        <Route path="/cghs-claim-form/*" element={<CghsClaimForm />} />
+        <Route path="/gis-cgegis-calculator/*" element={<GisCgegisCalculator />} />
+        <Route path="/leave-manager/*" element={<LeaveManager />} />
+        <Route path="/cea-reimbursement/*" element={<CeaReimbursement />} />
+        <Route path="/property-return-form/*" element={<PropertyReturnForm />} />
+        <Route path="/govt-form-reference/*" element={<GovtFormReference />} />
+        <Route path="/form-to-code-generator/*" element={<FormToCodeGenerator />} />
+        <Route path="/dynamic-form-creator/*" element={<DynamicFormCreatorApp />} />
       </Routes>
     </Suspense>
   );

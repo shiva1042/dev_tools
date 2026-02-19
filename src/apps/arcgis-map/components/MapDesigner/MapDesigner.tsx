@@ -16,12 +16,15 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import Alert from '@mui/material/Alert';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import WifiOffIcon from '@mui/icons-material/WifiOff';
+import ImageIcon from '@mui/icons-material/Image';
 import { useMapStore } from '../../store/mapStore';
 import type { BasemapType, CustomBasemapConfig } from '../../types';
+import { LOCAL_MAPS } from '../../../../shared/localMaps';
 
 const basemaps: { value: BasemapType; label: string; group: string }[] = [
   // Offline options
   { value: 'none', label: 'None (Offline)', group: 'Offline' },
+  { value: 'local-image', label: 'Local Map Image', group: 'Offline' },
   { value: 'custom', label: 'Custom URL (Local/GeoServer)', group: 'Offline' },
   // Online options
   { value: 'streets-vector', label: 'Streets', group: 'Online' },
@@ -61,6 +64,7 @@ export default function MapDesigner() {
     setSpatialReference,
     setBackgroundColor,
     setCustomBasemap,
+    setLocalImage,
   } = useMapStore();
 
   const [expanded, setExpanded] = useState<string | false>('basemap');
@@ -90,6 +94,19 @@ export default function MapDesigner() {
         url: '',
         title: 'Custom Basemap',
       });
+    }
+    // Set default local image if local-image selected
+    if (value === 'local-image' && !map.localImage) {
+      const defaultMap = LOCAL_MAPS[0];
+      setLocalImage({
+        name: defaultMap.name,
+        path: defaultMap.file,
+        extent: defaultMap.extent,
+      });
+    }
+    // Clear local image if not local-image
+    if (value !== 'local-image') {
+      setLocalImage(undefined);
     }
   };
 
@@ -204,6 +221,62 @@ export default function MapDesigner() {
                   {bgColorHex}
                 </Typography>
               </Box>
+            </Box>
+          )}
+
+          {/* Local Image Basemap Configuration */}
+          {map.basemap === 'local-image' && (
+            <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Alert severity="info" icon={<ImageIcon />}>
+                Uses a local map image as the basemap - works offline
+              </Alert>
+
+              <FormControl fullWidth size="small">
+                <InputLabel>Map Image</InputLabel>
+                <Select
+                  value={
+                    LOCAL_MAPS.findIndex(
+                      (m) => m.file === map.localImage?.path
+                    ) >= 0
+                      ? LOCAL_MAPS.findIndex(
+                          (m) => m.file === map.localImage?.path
+                        )
+                      : 0
+                  }
+                  label="Map Image"
+                  onChange={(e) => {
+                    const idx = e.target.value as number;
+                    const selected = LOCAL_MAPS[idx];
+                    setLocalImage({
+                      name: selected.name,
+                      path: selected.file,
+                      extent: selected.extent,
+                    });
+                  }}
+                >
+                  {LOCAL_MAPS.map((m, i) => (
+                    <MenuItem key={i} value={i}>
+                      {m.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+
+              {map.localImage && (
+                <Box
+                  sx={{
+                    p: 1.5,
+                    bgcolor: 'rgba(0,0,0,0.2)',
+                    borderRadius: 1,
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                  }}
+                >
+                  <Typography variant="caption" color="text.secondary">
+                    Extent: [{map.localImage.extent.xmin}, {map.localImage.extent.ymin}] to [{map.localImage.extent.xmax}, {map.localImage.extent.ymax}]
+                  </Typography>
+                </Box>
+              )}
             </Box>
           )}
 

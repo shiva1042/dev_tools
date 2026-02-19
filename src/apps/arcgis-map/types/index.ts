@@ -19,13 +19,20 @@ export type BasemapType =
   | 'streets-night-vector'
   | 'streets-navigation-vector'
   | 'none'
-  | 'custom';
+  | 'custom'
+  | 'local-image';
 
 export interface CustomBasemapConfig {
   type: 'tile' | 'wms' | 'wmts' | 'vector-tile';
   url: string;
   title?: string;
   sublayers?: string[]; // For WMS layer names
+}
+
+export interface LocalImageConfig {
+  name: string;
+  path: string;
+  extent: { xmin: number; ymin: number; xmax: number; ymax: number };
 }
 
 export interface MapConfig {
@@ -36,6 +43,7 @@ export interface MapConfig {
   spatialReference?: number;
   backgroundColor?: [number, number, number]; // RGB for 'none' basemap
   customBasemap?: CustomBasemapConfig; // For 'custom' basemap
+  localImage?: LocalImageConfig; // For 'local-image' basemap
 }
 
 // Layer types - All available ArcGIS JS layer types
@@ -338,6 +346,7 @@ export interface MapActions {
   setCenter: (center: [number, number]) => void;
   setBackgroundColor: (color: [number, number, number]) => void;
   setCustomBasemap: (config: CustomBasemapConfig | undefined) => void;
+  setLocalImage: (config: LocalImageConfig | undefined) => void;
   setZoom: (zoom: number) => void;
   setSpatialReference: (wkid: number) => void;
 

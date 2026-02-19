@@ -1,2 +1,0 @@
-import"./Expand-BjFL9QNU.js";function n(i){const{objectIdField:t,uniqueIdFields:e}=i;return e?.length?e.length>=2?{type:"unique-id-composite",fieldNames:e}:{type:"unique-id-simple",fieldName:e[0]}:{type:"object-id",fieldName:t}}export{n as e};
-//# sourceMappingURL=featureServiceUtils-DvJ8n4_2.js.map

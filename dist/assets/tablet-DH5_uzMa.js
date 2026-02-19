@@ -1,2 +1,0 @@
-import{c as e}from"./index-D7pXJXkH.js";const t=[["rect",{width:"18",height:"11",x:"3",y:"11",rx:"2",ry:"2",key:"1w4ew1"}],["path",{d:"M7 11V7a5 5 0 0 1 9.9-1",key:"1mm8w8"}]],n=e("lock-open",t);const o=[["rect",{width:"16",height:"20",x:"4",y:"2",rx:"2",ry:"2",key:"76otgf"}],["line",{x1:"12",x2:"12.01",y1:"18",y2:"18",key:"1dp563"}]],r=e("tablet",o);export{n as L,r as T};
-//# sourceMappingURL=tablet-DH5_uzMa.js.map

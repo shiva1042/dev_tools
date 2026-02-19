@@ -1,2 +1,0 @@
-import{a6 as r,_ as t,g as s,k as i}from"./Expand-BjFL9QNU.js";import"./index-D7pXJXkH.js";import"./Paper-Cyl37ja4.js";let e=class extends r{constructor(o){super(o),this.versionName=void 0,this.sessionId=void 0}};t([s({type:String,json:{write:!0}})],e.prototype,"versionName",void 0),t([s({type:String,json:{write:!0}})],e.prototype,"sessionId",void 0),e=t([i("esri.rest.versionManagement.support.DeleteVersionParameters")],e);const d=e;export{d as default};
-//# sourceMappingURL=DeleteVersionParameters-Dlnxgc14.js.map

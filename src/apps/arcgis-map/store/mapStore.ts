@@ -11,6 +11,7 @@ import type {
   PopupTemplateConfig,
   JsonDataLayerConfig,
   CustomBasemapConfig,
+  LocalImageConfig,
 } from '../types';
 
 // Generate unique IDs
@@ -86,6 +87,13 @@ export const useMapStore = create<MapStore>()(
             (state) => ({ map: { ...state.map, customBasemap: config } }),
             false,
             'setCustomBasemap'
+          ),
+
+        setLocalImage: (config: LocalImageConfig | undefined) =>
+          set(
+            (state) => ({ map: { ...state.map, localImage: config } }),
+            false,
+            'setLocalImage'
           ),
 
         // Layer actions

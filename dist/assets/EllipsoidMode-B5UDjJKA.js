@@ -1,2 +1,0 @@
-import{bE as o,hw as i,k_ as h,k$ as _}from"./Expand-BjFL9QNU.js";class a{constructor(r,u){this._textures=r,this.loadPromise=null,this._disposed=!1;const t=this._textures.acquire(u);o(t)?(t.then(s=>{this._disposed?i(s):this._textureRef=s}),this.loadPromise=t):this._textureRef=t}dispose(){this._textureRef=i(this._textureRef),this._disposed=!0}get glTexture(){return this._textureRef?.glTexture}}function d(e){return e&&h(e)?2:e&&_(e)?3:1}export{a as s,d as t};
-//# sourceMappingURL=EllipsoidMode-B5UDjJKA.js.map

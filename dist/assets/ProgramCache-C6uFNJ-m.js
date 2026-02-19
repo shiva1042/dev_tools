@@ -1,2 +1,0 @@
-import"./Expand-BjFL9QNU.js";import{s as n}from"./Program-Ox7ZYlru.js";class a{constructor(t){this._rctx=t,this._store=new Map}dispose(){this._store.forEach(t=>t.dispose()),this._store.clear()}acquire(t,e,i,c){const o=t+e+JSON.stringify(Array.from(i.entries())),r=this._store.get(o);if(r!=null)return r.ref(),r;const s=new n(this._rctx,t,e,i,c);return s.ref(),this._store.set(o,s),s}get test(){}}export{a as t};
-//# sourceMappingURL=ProgramCache-C6uFNJ-m.js.map

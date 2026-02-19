@@ -1,2 +1,0 @@
-import{d2 as f,hU as p,hV as c,H as h}from"./Expand-BjFL9QNU.js";import"./index-D7pXJXkH.js";import"./Paper-Cyl37ja4.js";async function q(a,o,t){const e=f(a),i=o.toJSON(),r=p(e.query,{query:c({...i,f:"json"}),...t,authMode:"immediate",method:"post"}),s=`${e.path}/create`,{data:n}=await h(s,r),{versionName:m,versionGuid:d,...u}=n.versionInfo;return{...u,versionIdentifier:{name:m,guid:d}}}export{q as createVersion};
-//# sourceMappingURL=createVersion-B6Cfgagj.js.map

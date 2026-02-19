@@ -1,2 +1,0 @@
-import{M as s,dW as a}from"./Expand-BjFL9QNU.js";const o=s("mac")?"Meta":"Control",c="Shift",h=2,r=1.15,M=1.15,m=2500,e=.02,f=Math.cos(a(45)),i=Math.cos(a(5)),n=.95,p=.3,b=2,d=1,l=3,x=11,C=22.5,S=40,$=48,g=2.25,j=4,k=1,q=.3,u=6,v=4,U=1600,W=.4;export{S as C,b as M,$ as S,g as U,r as a,j as b,M as c,k as d,f as e,n as f,q as g,e as h,i,d as j,u as k,l,m,x as n,p,v as q,c as r,h as s,o as t,U as u,W as v,C as x};
-//# sourceMappingURL=sliceToolConfig-C1moyEkA.js.map

@@ -21,6 +21,9 @@ import {
   ListItemSecondaryAction,
   Menu,
   MenuItem,
+  Select,
+  FormControl,
+  InputLabel,
   Dialog,
   DialogTitle,
   DialogContent,
@@ -50,12 +53,15 @@ import Map from '@arcgis/core/Map';
 import MapView from '@arcgis/core/views/MapView';
 import Graphic from '@arcgis/core/Graphic';
 import GraphicsLayer from '@arcgis/core/layers/GraphicsLayer';
+import MediaLayer from '@arcgis/core/layers/MediaLayer';
+import ImageElement from '@arcgis/core/layers/support/ImageElement';
+import ExtentAndRotationGeoreference from '@arcgis/core/layers/support/ExtentAndRotationGeoreference';
+import Extent from '@arcgis/core/geometry/Extent';
 import SketchViewModel from '@arcgis/core/widgets/Sketch/SketchViewModel';
-import BasemapGallery from '@arcgis/core/widgets/BasemapGallery';
-import Expand from '@arcgis/core/widgets/Expand';
 import SimpleMarkerSymbol from '@arcgis/core/symbols/SimpleMarkerSymbol';
 import SimpleLineSymbol from '@arcgis/core/symbols/SimpleLineSymbol';
 import SimpleFillSymbol from '@arcgis/core/symbols/SimpleFillSymbol';
+import { LOCAL_MAPS } from '../../shared/localMaps';
 
 // ArcGIS CSS
 import '@arcgis/core/assets/esri/themes/dark/main.css';
@@ -96,9 +102,12 @@ const defaultColors = [
 export default function App() {
   const mapDiv = useRef<HTMLDivElement>(null);
   const viewRef = useRef<MapView | null>(null);
+  const mapObjRef = useRef<Map | null>(null);
   const graphicsLayerRef = useRef<GraphicsLayer | null>(null);
   const sketchRef = useRef<SketchViewModel | null>(null);
+  const mediaLayerRef = useRef<MediaLayer | null>(null);
 
+  const [selectedMapIndex, setSelectedMapIndex] = useState(0);
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [fillColor, setFillColor] = useState('#2196f3');
   const [strokeColor, setStrokeColor] = useState('#ffffff');
@@ -115,6 +124,29 @@ export default function App() {
   const [exportFileName, setExportFileName] = useState('map-export');
   const [exportQuality, setExportQuality] = useState(1);
 
+  // Create a MediaLayer from a local map image config
+  const createMediaLayer = useCallback((mapIndex: number) => {
+    const mapImage = LOCAL_MAPS[mapIndex];
+    const imageElement = new ImageElement({
+      image: mapImage.file,
+      georeference: new ExtentAndRotationGeoreference({
+        extent: new Extent({
+          xmin: mapImage.extent.xmin,
+          ymin: mapImage.extent.ymin,
+          xmax: mapImage.extent.xmax,
+          ymax: mapImage.extent.ymax,
+          spatialReference: { wkid: 4326 },
+        }),
+      }),
+    });
+
+    return new MediaLayer({
+      source: [imageElement],
+      title: mapImage.name,
+      id: 'local-basemap-layer',
+    });
+  }, []);
+
   // Initialize map
   useEffect(() => {
     if (!mapDiv.current) return;
@@ -124,10 +156,15 @@ export default function App() {
     });
     graphicsLayerRef.current = graphicsLayer;
 
+    // Create initial MediaLayer for local basemap image
+    const mediaLayer = createMediaLayer(selectedMapIndex);
+    mediaLayerRef.current = mediaLayer;
+
     const map = new Map({
-      basemap: 'dark-gray-vector',
-      layers: [graphicsLayer],
+      basemap: 'none' as any,
+      layers: [mediaLayer, graphicsLayer],
     });
+    mapObjRef.current = map;
 
     const view = new MapView({
       container: mapDiv.current,
@@ -136,6 +173,9 @@ export default function App() {
       zoom: 12,
       ui: {
         components: ['zoom', 'compass'],
+      },
+      background: {
+        color: [10, 25, 41, 1] as any, // Dark background matching theme
       },
     });
 
@@ -174,20 +214,6 @@ export default function App() {
           setActiveTool(null);
         }
       });
-
-      // Add basemap gallery
-      const basemapGallery = new BasemapGallery({
-        view: view,
-      });
-
-      const bgExpand = new Expand({
-        view: view,
-        content: basemapGallery,
-        expandIcon: 'basemap',
-        expandTooltip: 'Basemap Gallery',
-      });
-
-      view.ui.add(bgExpand, 'top-right');
     });
 
     return () => {
@@ -302,6 +328,23 @@ export default function App() {
     setColorAnchor(null);
   };
 
+  // Handle switching local map image
+  const handleMapImageChange = (index: number) => {
+    setSelectedMapIndex(index);
+    const map = mapObjRef.current;
+    if (!map) return;
+
+    // Remove old media layer
+    if (mediaLayerRef.current) {
+      map.remove(mediaLayerRef.current);
+    }
+
+    // Create and add new media layer at the bottom
+    const newMediaLayer = createMediaLayer(index);
+    mediaLayerRef.current = newMediaLayer;
+    map.add(newMediaLayer, 0);
+  };
+
   const getGraphicIcon = (type: string) => {
     switch (type) {
       case 'point':
@@ -411,6 +454,30 @@ export default function App() {
               overflow: 'auto',
             }}
           >
+            {/* Map Image Selector */}
+            <Box>
+              <Typography variant="subtitle2" sx={{ mb: 1, color: 'primary.main' }}>
+                <MapIcon sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'text-bottom' }} />
+                Base Map
+              </Typography>
+              <FormControl fullWidth size="small">
+                <InputLabel>Map Image</InputLabel>
+                <Select
+                  value={selectedMapIndex}
+                  label="Map Image"
+                  onChange={(e) => handleMapImageChange(e.target.value as number)}
+                >
+                  {LOCAL_MAPS.map((m, i) => (
+                    <MenuItem key={i} value={i}>
+                      {m.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Divider />
+
             {/* Drawing Tools */}
             <Box>
               <Typography variant="subtitle2" sx={{ mb: 1, color: 'primary.main' }}>
